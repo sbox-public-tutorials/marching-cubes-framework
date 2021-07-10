@@ -32,11 +32,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\Games\\Steam\\steamapps\\common\\sbox\\Addons\\marching-cubes\\code\\marching-cubes.csproj",
-      "projectName": "marching-cubes",
-      "projectPath": "E:\\Games\\Steam\\steamapps\\common\\sbox\\Addons\\marching-cubes\\code\\marching-cubes.csproj",
+      "projectUniqueName": "E:\\Games\\Steam\\steamapps\\common\\sbox\\Addons\\marching-cubes-framework\\code\\marching-cubes-framework.csproj",
+      "projectName": "marching-cubes-framework",
+      "projectPath": "E:\\Games\\Steam\\steamapps\\common\\sbox\\Addons\\marching-cubes-framework\\code\\marching-cubes-framework.csproj",
       "packagesPath": "C:\\Users\\Main\\.nuget\\packages\\",
-      "outputPath": "E:\\Games\\Steam\\steamapps\\common\\sbox\\Addons\\marching-cubes\\code\\obj\\",
+      "outputPath": "E:\\Games\\Steam\\steamapps\\common\\sbox\\Addons\\marching-cubes-framework\\code\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Main\\AppData\\Roaming\\NuGet\\NuGet.Config",

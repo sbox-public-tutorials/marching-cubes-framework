@@ -2,6 +2,13 @@ namespace MarchingCubes
 {
 	public static class Triangulation
 	{
+		//A table borrowed from Sebastian Lague,
+		//https://github.com/SebLague/Marching-Cubes/blob/4fd221eb023b90a0d49f0dd7ea886ec2e2a8c3ac/Assets/Scripts/Compute/Includes/MarchTables.compute
+		//who got it from
+		//http://paulbourke.net/geometry/polygonise/
+
+		//Represents all of the verticies within one cube to build the triangles
+		//The indicies refer to the offsets below.
 		public static int[,] vertexTable = new int[256,16]
 		{
 			{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },

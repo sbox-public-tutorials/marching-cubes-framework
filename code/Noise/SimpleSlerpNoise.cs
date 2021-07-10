@@ -8,8 +8,7 @@ using Sandbox;
 
 namespace MarchingCubes
 {
-	//This is the class I am using to generate noise values, technically anything works.
-	//If you want to help with this, give a read through and maybe try looking at getGridValue()
+	//This is the class I am using to generate noise values.
 	class SimpleSlerpNoise
 	{
 		int seed;
@@ -74,27 +73,39 @@ namespace MarchingCubes
 
 		private int getGridValue(int gridX, int gridY, int gridZ)
 		{
-			//timer.Start();
-			//Random r = new Random(getPositionalSeed(gridX, gridY, gridZ));
-			//int random = r.Next();
-			//timer.Stop();
-
-			//This function will be MUCH faster if you can remove the new Random() and still get relatively normal numbers
-			//Perhaps implementing my own LCG function or something. Or a hash function that looks nearly-random.
-			int positionalSeed = getPositionalSeed( gridX, gridY, gridZ );
-
-			return (new Random( positionalSeed ).Next() - (int.MaxValue/2)) * 2; 
-			//Have to do some math weirdness to get to [-maxInt, maxInt]
-
-			//return positionalSeed;
+			return lcg( getPositionalSeed( gridX, gridY, gridZ ) );
 		}
 
-		public static float sCurve( float w )
+		public int lcg( int seed )
 		{
-			return (1 * ((w * (w * 6.0f - 15.0f) + 10.0f) * w * w * w));
+			//Random prime numbers seem to work
+			return lcg( 102191, 104047, 3, seed );
+		}
+
+		//Linear congruent generator
+		public int lcg( int a, int c, int n, int n0 )
+		{
+			if ( n == 0 )
+			{
+				return n0;
+			}
+			else
+			{
+				return ((a * lcg( a, c, n - 1, n0 )) + c);
+			}
+		}
+
+		//For inputs between x=[0,1] returns a smooth curve between y=[0,1]
+		//With x=0 and x=1 having slopes of zero
+		public static float sCurve( float x )
+		{
+			return (1 * ((x * (x * 6.0f - 15.0f) + 10.0f) * x * x * x));
 		}
 
 		//FNV-1 Hash
+		//Good for getting different values for each position,
+		//but positions that are close on some axis get similar values,
+		//so for randomness the LCG must be used as well. with this as a seed.
 		private int getPositionalSeed( int x, int y, int z )
 		{
 			uint h = 2166136261;
