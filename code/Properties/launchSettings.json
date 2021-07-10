@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "marching-cubes": {
+      "commandName": "Executable",
+      "executablePath": "E:\\Games\\Steam\\steamapps\\common\\sbox\\sbox.exe",
+      "commandLineArgs": "+developer -w 1600 -h 900 -sw worked -noassert "
+    }
+  }
+}

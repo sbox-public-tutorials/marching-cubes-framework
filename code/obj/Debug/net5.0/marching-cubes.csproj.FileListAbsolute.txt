@@ -1,0 +1,14 @@
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\.intermediate\net5.0\marching-cubes.deps.json
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\.intermediate\net5.0\marching-cubes.dll
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\.intermediate\net5.0\ref\marching-cubes.dll
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\.intermediate\net5.0\marching-cubes.pdb
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\.intermediate\net5.0\marching-cubes.xml
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\code\obj\Debug\net5.0\marching-cubes.csproj.AssemblyReference.cache
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\code\obj\Debug\net5.0\marching-cubes.GeneratedMSBuildEditorConfig.editorconfig
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\code\obj\Debug\net5.0\marching-cubes.AssemblyInfoInputs.cache
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\code\obj\Debug\net5.0\marching-cubes.AssemblyInfo.cs
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\code\obj\Debug\net5.0\marching-cubes.csproj.CoreCompileInputs.cache
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\code\obj\Debug\net5.0\marching-cubes.csproj.CopyComplete
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\code\obj\Debug\net5.0\marching-cubes.dll
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\code\obj\Debug\net5.0\ref\marching-cubes.dll
+E:\Games\Steam\steamapps\common\sbox\Addons\marching-cubes\code\obj\Debug\net5.0\marching-cubes.pdb
