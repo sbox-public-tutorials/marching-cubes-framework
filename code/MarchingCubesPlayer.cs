@@ -42,74 +42,144 @@ namespace MarchingCubes
 
 			SimulateActiveChild( cl, ActiveChild );
 
-			//Compute grid-coords for the noise
-			int x = (int)(Position.x / 1984);
-			int y = (int)(Position.y / 1984);
-			int z = (int)(Position.z / 1984);
-
-			//For each grid in a square 5 (2 in each direction)
-			for(int i = -2; i <= 2; i++ )
 			{
-				for ( int j = -2; j <= 2; j++ )
-				{
-					int xUsing = x + i;
-					int yUsing = y + j;
+				//Compute grid-coords for the noise
+				int x = (int)(Position.x / 1984);
+				int y = (int)(Position.y / 1984);
+				int z = (int)(Position.z / 1984);
 
-					//Check if a mesh has been generated for that grid point.
-					if ( !generatedMap.ContainsKey( (xUsing, yUsing) ) )
+				//For each grid in a square 5 (2 in each direction)
+				for ( int i = -2; i <= 2; i++ )
+				{
+					for ( int j = -2; j <= 2; j++ )
 					{
-						//If not, build the meshes, and add an entry signaling that the coordinate is built.
-						generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 1,  (xUsing * 31) + 31, (yUsing * 31) + 31, 31 );
-						generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 + 1984 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 32, (xUsing * 31) + 31, (yUsing * 31) + 31, 62 );
-						generatedMap[(xUsing, yUsing)] = true;
+						int xUsing = x + i;
+						int yUsing = y + j;
+
+						//Check if a mesh has been generated for that grid point.
+						if ( !generatedMap.ContainsKey( (xUsing, yUsing) ) )
+						{
+							//If not, build the meshes, and add an entry signaling that the coordinate is built.
+							generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 1, (xUsing * 31) + 31, (yUsing * 31) + 31, 31 );
+							generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 + 1984 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 32, (xUsing * 31) + 31, (yUsing * 31) + 31, 62 );
+							generatedMap[(xUsing, yUsing)] = true;
+						}
+
 					}
 				}
 			}
+			
 
 			if ( Input.Pressed( InputButton.Attack1 ) )
 			{
-				Stopwatch st = new Stopwatch();
-				int n = 100_000;
-				float accumulator = 0;
-				st.Start();
-				for(int i = 0; i < n; i++ )
+				if(false)
 				{
-					accumulator += Noise.Perlin( i / (float)n, 0, 0 );
+					Stopwatch st = new Stopwatch();
+					int n = 500_000;
+					float accumulator = 0;
+					st.Start();
+					for(int i = 0; i < n; i++ )
+					{
+						accumulator += Noise.Perlin( i / (float)n, 0, 0 );
+					}
+					st.Stop();
+					Log.Info( "Perlin Took: " + st.ElapsedMilliseconds + "ms." );
+
+					st.Reset();
+
+					accumulator = 0; 
+					SimpleSlerpNoise ssn = new SimpleSlerpNoise( 0, new int[] { 1, 8, 16 }, new float[] { 0.01f, 0.25f, 0.74f } );
+					st.Start();
+					for ( int i = 0; i < n; i++ )
+					{
+						accumulator += ssn.getValue( i, 0, 0 );
+					}
+					st.Stop();
+					Log.Info( "DIY Took: " + st.ElapsedMilliseconds + "ms." );
 				}
-				st.Stop();
-				Log.Info( "A Took: " + st.ElapsedMilliseconds + "ms." );
 
-				st.Reset();
-
-				accumulator = 0; 
-				SimpleSlerpNoise ssn = new SimpleSlerpNoise( 0, new int[] { 1, 8, 16 }, new float[] { 0.01f, 0.25f, 0.74f } );
-				st.Start();
-				for ( int i = 0; i < n; i++ )
+				if(false)
 				{
-					accumulator += ssn.getValue( i, 0, 0 );
+					Vector3 position = EyePos + EyeRot.Forward * 512;
+					Stopwatch sw = new Stopwatch();
+					float accumulation = 0.0f;
+					sw.Start();
+					for ( int y = 0; y < 100_000; y++ )
+					{
+						for ( int x = 0; x < 1; x++ )
+						{
+
+							SimpleSlerpNoise ssn = new SimpleSlerpNoise( 0, new int[] { 1, 2, 8, 16 }, new float[] { 0.02f, 0.02f, 0.3f, 0.66f } );
+							float val = ssn.getValue( x, y, 0 );
+
+							/*
+							float val = Noise.Perlin( x / 25f, y / 25f, 0 );
+							*/
+
+							/*
+							float val = 0;
+							int multiplier = 64;
+							float amplitude = 0.5f;
+							float lacunarity = 1.8f;
+							float persistence = 1.0f;
+							float x1 = (float) x / multiplier;
+							float y1 = (float) y / multiplier;
+							for ( int n = 0; n < 5; n++ )
+							{
+								val += Noise.Perlin( x1, y1, 0 ) * amplitude;
+								x1 *= lacunarity;
+								y1 *= lacunarity;
+								amplitude *= persistence;
+							}
+							*/
+
+							val += 1f;
+							val /= 2f;
+							accumulation += val;
+							//DebugOverlay.Sphere( position + new Vector3( x, y, 0 ) * 64, 32, new Color( val, val, val ), true, 2.5f );
+						}
+					}
+					sw.Stop();
+					Log.Info( "Took: " + sw.ElapsedMilliseconds + "ms." );
 				}
-				st.Stop();
-				Log.Info( "B Took: " + st.ElapsedMilliseconds + "ms." );
+
+				if(false)
+				{
+					Stopwatch sw = new Stopwatch();
+					float accumulation = 0.0f;
+					SimpleSlerpNoise ssn = new SimpleSlerpNoise( 0, new int[] { 1, 2, 8, 16 }, new float[] { 0.02f, 0.02f, 0.3f, 0.66f } );
+
+					sw.Start();
+					for ( int i = 0; i < 30; i++ )
+					{
+						for ( int j = 0; j < 30; j++ )
+						{
+							for ( int k = 0; k < 30; k++ )
+							{
+								//Noise.Perlin( i, 0, 0 );
+								accumulation += ssn.getValue( i, j, k );
+							}
+						}
+					}
+					sw.Stop();
+					float calibration = 18;
+					Log.Info( "Took: " + (sw.ElapsedMilliseconds - calibration) + "ms." );
+					Log.Info( "Internal took " + (ssn.timer.ElapsedMilliseconds - calibration) + "ms." );
+				}
+
+				/*
+				if(true && IsClient)
+				{
+					for(int i = 0; i < 20; i++ )
+					{
+						Log.Info(SimpleSlerpNoise.lcg( 102191, 0, 3, i ) );
+					}
+				}
+				*/
+				
 			}
 		}
 
-
-		public int lcg(int seed)
-		{
-			//return lcg( 5059, 6037, 137, seed );
-			return lcg( 102191, 104047, 2, seed );
-		}
-		public int lcg(int a, int c, int n, int n0)
-		{
-			if ( n == 0 )
-			{
-				return n0;
-			}
-			else
-			{
-				return ((a * lcg(a, c, n - 1, n0 )) + c);
-			}
-		}
 		public void generateMarchingCubes(Vector3 position, int x0, int y0, int z0, int x1, int y1, int z1)
 		{
 			//SimpleSlerpNoise ssn = new SimpleSlerpNoise( count, new int[] { 2, 8, 16 }, new float[] { 0.15f, 0.25f, 0.60f } );
@@ -119,7 +189,7 @@ namespace MarchingCubes
 			//Uncomment to visualize the bounds of the generated area
 			//DebugOverlay.Box( 9999f, position, position + (new Vector3( points.GetLength( 0 ), points.GetLength( 1 ), points.GetLength( 2 ) ) * 64), Color.White, true);
 			Stopwatch a = new Stopwatch();
-			a.Start();
+			//a.Start();
 			for ( int i = 0; i < points.GetLength( 0 ); i++ )
 			{
 				for ( int j = 0; j < points.GetLength( 1 ); j++ )
@@ -142,9 +212,10 @@ namespace MarchingCubes
 					}
 				}
 			}
-			a.Stop();
-			Log.Info( "Numbers took: " + a.ElapsedMilliseconds +"ms." );
-
+			//a.Stop();
+			//Log.Info( "Numbers took: " + a.ElapsedMilliseconds +"ms." );
+			//a.Reset();
+			//a.Start();
 			//Material material = Material.Load( "materials/dev/gray_25.vmat" );
 			Material material = Material.Load( "materials/dev/dev_measuregeneric01.vmat" );
 			Mesh mesh = new Mesh( material );
@@ -281,7 +352,9 @@ namespace MarchingCubes
 				e.SetupPhysicsFromModel( PhysicsMotionType.Static );
 				e.Spawn();
 			}
-			
+			//a.Stop();
+			//Log.Info( "Everything else took: " + a.ElapsedMilliseconds + "ms." );
+
 		}
 
 		[StructLayout( LayoutKind.Sequential )]

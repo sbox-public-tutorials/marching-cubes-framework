@@ -14,7 +14,7 @@ namespace MarchingCubes
 		private int seed;
 		public Fast3DPerlin(int seed)
 		{
-			seed = seed;
+			this.seed = seed;
 		}
 
 		public float getValue(float x, float y, float z)

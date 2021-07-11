@@ -46,10 +46,10 @@ namespace MarchingCubes
 				int val101 = getGridValue(gridX + 1, gridY, gridZ + 1);
 				int val011 = getGridValue(gridX, gridY + 1, gridZ + 1);
 				int val111 = getGridValue(gridX + 1, gridY + 1, gridZ + 1);
-
-				float offsetX = NDimensionalPerlin.sCurve( (x - (gridX * octaveValuesPerGrid)) / (float)octaveValuesPerGrid );
-				float offsetY = NDimensionalPerlin.sCurve( (y - (gridY * octaveValuesPerGrid)) / (float)octaveValuesPerGrid );
-				float offsetZ = NDimensionalPerlin.sCurve( (z - (gridZ * octaveValuesPerGrid)) / (float)octaveValuesPerGrid );
+				
+				float offsetX = sCurve( (x - (gridX * octaveValuesPerGrid)) / (float)octaveValuesPerGrid );
+				float offsetY = sCurve( (y - (gridY * octaveValuesPerGrid)) / (float)octaveValuesPerGrid );
+				float offsetZ = sCurve( (z - (gridZ * octaveValuesPerGrid)) / (float)octaveValuesPerGrid );
 				float inverseOffsetX = 1 - offsetX;
 				float inverseOffsetY = 1 - offsetY;
 				float inverseOffsetZ = 1 - offsetZ;
@@ -79,7 +79,10 @@ namespace MarchingCubes
 		public int lcg( int seed )
 		{
 			//Random prime numbers seem to work
-			return lcg( 102191, 104047, 3, seed );
+			//timer.Start();
+			int val = lcg( 102191, 0, 3, seed );
+			//timer.Stop();
+			return val;
 		}
 
 		//Linear congruent generator
@@ -89,6 +92,19 @@ namespace MarchingCubes
 			{
 				return n0;
 			}
+			else if(c == 0)
+			{
+				//According to one site (which I need to come back and grab)
+				//this formula can be used to collapse the recursive structure
+				//as long as c is 0. Based on some tests it seems to be 
+				//random enough for these purposes.
+				int an = 1;
+				for(int i = 0; i < n; i++ )
+				{
+					an *= a;
+				}
+				return an * n0;
+			}
 			else
 			{
 				return ((a * lcg( a, c, n - 1, n0 )) + c);
@@ -97,17 +113,21 @@ namespace MarchingCubes
 
 		//For inputs between x=[0,1] returns a smooth curve between y=[0,1]
 		//With x=0 and x=1 having slopes of zero
-		public static float sCurve( float x )
+		public float sCurve( float x )
 		{
 			return (1 * ((x * (x * 6.0f - 15.0f) + 10.0f) * x * x * x));
 		}
 
-		//FNV-1 Hash
 		//Good for getting different values for each position,
 		//but positions that are close on some axis get similar values,
 		//so for randomness the LCG must be used as well. with this as a seed.
 		private int getPositionalSeed( int x, int y, int z )
 		{
+			/*
+			//Used to be an FNV-1 Hash, seems like this new system is fine.
+			//It will absolutely repeat eventually, but oh well.
+			//Multiplications were very slow.
+			timer.Start();
 			uint h = 2166136261;
 			h *= 16777619;
 			h ^= (uint)seed; 
@@ -117,6 +137,14 @@ namespace MarchingCubes
 			h ^= (uint)y;
 			h *= 16777619;
 			h ^= (uint)z;
+			timer.Stop();
+			return (int)h;
+			*/
+			uint h = 2166136261;
+			h ^= (uint)seed;
+			h ^= (uint) ((x << 0 ) | (x << (32 - 0 )));
+			h ^= (uint) ((y << 12) | (y << (32 - 12)));
+			h ^= (uint) ((z << 24) | (z << (32 - 24)));
 			return (int)h;
 		}
 	}
