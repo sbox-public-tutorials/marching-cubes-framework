@@ -11,11 +11,13 @@ namespace MarchingCubes
 	partial class MarchingCubesPlayer : Player
 	{
 		private const int maxVertexCount = 1 << 16;
-		Dictionary<(int, int), bool> generatedMap;
+		Dictionary<(int, int), ModelEntity> generatedMap;
+		Dictionary<(int, int, int), bool> overrideMap;
 
 		public MarchingCubesPlayer() : base()
 		{
-			generatedMap = new Dictionary<(int, int), bool>();
+			generatedMap = new Dictionary<(int, int), ModelEntity>();
+			overrideMap = new Dictionary<(int, int, int), bool>();
 		}
 
 		public override void Respawn()
@@ -61,9 +63,10 @@ namespace MarchingCubes
 						if ( !generatedMap.ContainsKey( (xUsing, yUsing) ) )
 						{
 							//If not, build the meshes, and add an entry signaling that the coordinate is built.
-							generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 ),        (xUsing * 31) + 1, (yUsing * 31) + 1, 1 , (xUsing * 31) + 31, (yUsing * 31) + 31, 31 );
-							generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 + 1984 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 32, (xUsing * 31) + 31, (yUsing * 31) + 31, 62 );
-							generatedMap[(xUsing, yUsing)] = true;
+							ModelEntity e = generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 1 , (xUsing * 31) + 31, (yUsing * 31) + 31, 62 );
+							//generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 + 1984 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 32, (xUsing * 31) + 31, (yUsing * 31) + 31, 62 );
+							Log.Info( "X,y: " + xUsing + ", " + yUsing );
+							generatedMap[(xUsing, yUsing)] = e;
 						}
 
 					}
@@ -178,24 +181,69 @@ namespace MarchingCubes
 				}
 				*/
 
-				if(true && IsClient)
-				{
-					SimpleSlerpNoise ssn = new SimpleSlerpNoise( 0, new int[] { 4 }, new float[] { 1.0f } );
-					for(int i = -10; i < 10; i++ )
-					{
-						Log.Info( ssn.getValue( i, 0, 0 ) );
-					}
-				}
 				if(false)
 				{
 					Vector3 position = EyePos + EyeRot.Forward * 512;
 					generateMarchingCubes( position, 0, 0, 0, 31, 31, 31 );
 				}
-				
+			}
+
+
+
+
+			if ( Input.Pressed( InputButton.Attack1 ) )
+			{
+				ThirdPersonCamera tpc = ((ThirdPersonCamera)this.Camera);
+				Vector3 pos = tpc.Pos;
+				Vector3 dir = tpc.Rot.Forward;
+				//DebugOverlay.Line( pos, pos + (dir * 1000), 0.25f, true );
+
+				//TraceResult tr = Sandbox.Trace.Ray( pos, pos + dir * 999999 ).UseHitboxes().Run();
+				TraceResult tr = Sandbox.Trace.Ray( EyePos + EyeRot.Forward * 64, EyePos + EyeRot.Forward * 9999 ).Run();
+
+				if ( tr.Hit )
+				{
+					DebugOverlay.Sphere( tr.EndPos, 5f, Color.White, true, 0.25f );
+					Log.Info( "Actual hit pos: " + tr.EndPos );
+					int x = (int)(tr.EndPos.x / 64);
+					int y = (int)(tr.EndPos.y / 64);
+					int z = (int)((tr.EndPos.z-4096) / 64);
+
+					int worldMapX = (int)(tr.EndPos.x / 1984);
+					int worldMapY = (int)(tr.EndPos.y / 1984);
+					//Log.Info( worldMapX );
+					//Log.Info( worldMapY );
+					Vector3 thePos = new Vector3( worldMapX * 1984, worldMapY * 1984, 4096 );
+
+					for(int i = -1; i <= 1; i++ )
+					{
+						for ( int j = -1; j <= 1; j++ )
+						{
+							for ( int k = -1; k <= 1; k++ )
+							{
+								overrideMap[(x + k, y + j, z + i)] = false;
+								Log.Info( "A: " + (x + k, y + j, z + i) );
+							}
+						}
+					}
+
+					//Log.Info( tr.EndPos );
+
+					ModelEntity a1 = generatedMap[(worldMapX, worldMapY)];
+
+					ModelEntity e = generateMarchingCubes( thePos, (worldMapX * 31) + 1, (worldMapY * 31) + 1, 1, (worldMapX * 31) + 31, (worldMapY * 31) + 31, 62 );
+					Log.Info( ((worldMapX * 31) + 1, (worldMapX * 31) + 31) );
+					Log.Info( ((worldMapY * 31) + 1, (worldMapY * 31) + 31) );
+
+					generatedMap[(worldMapX, worldMapY)].DeleteAsync( 0.0f );
+					generatedMap.Remove( (worldMapX, worldMapY) );
+
+					generatedMap[(worldMapX, worldMapY) ] = e;
+				}
 			}
 		}
 
-		public void generateMarchingCubes(Vector3 position, int x0, int y0, int z0, int x1, int y1, int z1)
+		public ModelEntity generateMarchingCubes(Vector3 position, int x0, int y0, int z0, int x1, int y1, int z1)
 		{
 			//SimpleSlerpNoise ssn = new SimpleSlerpNoise( count, new int[] { 2, 8, 16 }, new float[] { 0.15f, 0.25f, 0.60f } );
 			SimpleSlerpNoise ssn = new SimpleSlerpNoise( 0, new int[] { 1, 8, 16 }, new float[] { 0.01f, 0.25f, 0.74f } );
@@ -205,25 +253,42 @@ namespace MarchingCubes
 			//DebugOverlay.Box( 9999f, position, position + (new Vector3( points.GetLength( 0 ), points.GetLength( 1 ), points.GetLength( 2 ) ) * 64), Color.White, true);
 			Stopwatch a = new Stopwatch();
 			//a.Start();
+
 			for ( int i = 0; i < points.GetLength( 0 ); i++ )
 			{
 				for ( int j = 0; j < points.GetLength( 1 ); j++ )
 				{
 					for ( int k = 0; k < points.GetLength( 2 ); k++ )
 					{
-						//Noise.Perlin is still noticably faster. 
-						//Hopefully something can be done about this.
+						int globalX = i + x0 - 1;
+						int globalY = j + y0 - 1;
+						int globalZ = k + z0 - 1;
+						//Log.Info( "Checking: " + globalX + ", " + globalY + ", " + globalZ );
 
-						//float val = Noise.Perlin( i / 8f, j / 8f, k / 8f );
-						float val = ssn.getValue( i + x0 - 1, j + y0 - 1, k + z0 - 1);
-						//Convert [-1,1] range to [0,1]
-						val += 1f;
-						val /= 2f;
+						if ( overrideMap.ContainsKey( (globalX, globalY, globalZ) ) )
+						{
+							Log.Info( "Found a hit: " + globalX + ", " + globalY + ", " + globalZ + " : " + overrideMap[(globalX, globalY, globalZ)] );
+							points[i, j, k] = overrideMap[(globalX, globalY, globalZ)];
+							continue;
+						}
+						else
+						{
+							//Noise.Perlin is still noticably faster. 
+							//Hopefully something can be done about this.
 
-						points[i, j, k] = val < ((1.0f / ((z0+k) + 5f)) * 7f) - 0.11f;
+							//float val = Noise.Perlin( i / 8f, j / 8f, k / 8f );
+							float val = ssn.getValue( i + x0 - 1, j + y0 - 1, k + z0 - 1 );
+							//Convert [-1,1] range to [0,1]
+							val += 1f;
+							val /= 2f;
 
-						//Uncomment this line if you want a giant ball of laggy spheres to visualize the noise.
-						//DebugOverlay.Sphere( position + new Vector3( i, j, k ) * 64, 32, new Color(val, val, val), true, 5f );
+							points[i, j, k] = val < ((1.0f / ((z0 + k) + 5f)) * 7f) - 0.11f;
+
+							//Uncomment this line if you want a giant ball of laggy spheres to visualize the noise.
+							//DebugOverlay.Sphere( position + new Vector3( i, j, k ) * 64, 32, new Color(val, val, val), true, 5f );
+						}
+
+
 					}
 				}
 			}
@@ -391,7 +456,9 @@ namespace MarchingCubes
 				e.Position = position;
 				e.SetupPhysicsFromModel( PhysicsMotionType.Static );
 				e.Spawn();
+				return e;
 			}
+			return null;
 			//a.Stop();
 			//Log.Info( "Everything else took: " + a.ElapsedMilliseconds + "ms." );
 
