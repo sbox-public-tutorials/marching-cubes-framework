@@ -67,7 +67,7 @@ namespace MarchingCubes
 						{
 							//If not, build the meshes, and add an entry signaling that the coordinate is built.
 							ModelEntity e = generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 1 , (xUsing * 31) + 31, (yUsing * 31) + 31, 62 );
-							Log.Info( "X,y: " + xUsing + ", " + yUsing );
+							
 							generatedMap[(xUsing, yUsing)] = e;
 						}
 
@@ -89,7 +89,7 @@ namespace MarchingCubes
 				if ( tr.Hit )
 				{
 					DebugOverlay.Sphere( tr.EndPos, 5f, Color.White, true, 0.25f );
-					Log.Info( "Actual hit pos: " + tr.EndPos );
+
 					int x = (int)(tr.EndPos.x / 64);
 					int y = (int)(tr.EndPos.y / 64);
 					int z = (int)((tr.EndPos.z-4096) / 64);
@@ -106,7 +106,6 @@ namespace MarchingCubes
 							for ( int k = -1; k <= 1; k++ )
 							{
 								overrideMap[(x + k, y + j, z + i)] = false;
-								Log.Info( "A: " + (x + k, y + j, z + i) );
 							}
 						}
 					}
@@ -114,8 +113,6 @@ namespace MarchingCubes
 					ModelEntity a1 = generatedMap[(worldMapX, worldMapY)];
 
 					ModelEntity e = generateMarchingCubes( thePos, (worldMapX * 31) + 1, (worldMapY * 31) + 1, 1, (worldMapX * 31) + 31, (worldMapY * 31) + 31, 62 );
-					Log.Info( ((worldMapX * 31) + 1, (worldMapX * 31) + 31) );
-					Log.Info( ((worldMapY * 31) + 1, (worldMapY * 31) + 31) );
 
 					generatedMap[(worldMapX, worldMapY)].DeleteAsync( 0.0f );
 					generatedMap.Remove( (worldMapX, worldMapY) );
