@@ -61,7 +61,7 @@ namespace MarchingCubes
 						if ( !generatedMap.ContainsKey( (xUsing, yUsing) ) )
 						{
 							//If not, build the meshes, and add an entry signaling that the coordinate is built.
-							generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 1, (xUsing * 31) + 31, (yUsing * 31) + 31, 31 );
+							generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 ),        (xUsing * 31) + 1, (yUsing * 31) + 1, 1 , (xUsing * 31) + 31, (yUsing * 31) + 31, 31 );
 							generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 + 1984 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 32, (xUsing * 31) + 31, (yUsing * 31) + 31, 62 );
 							generatedMap[(xUsing, yUsing)] = true;
 						}
@@ -178,6 +178,14 @@ namespace MarchingCubes
 				}
 				*/
 
+				if(true && IsClient)
+				{
+					SimpleSlerpNoise ssn = new SimpleSlerpNoise( 0, new int[] { 4 }, new float[] { 1.0f } );
+					for(int i = -10; i < 10; i++ )
+					{
+						Log.Info( ssn.getValue( i, 0, 0 ) );
+					}
+				}
 				if(false)
 				{
 					Vector3 position = EyePos + EyeRot.Forward * 512;

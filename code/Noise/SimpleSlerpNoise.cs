@@ -31,22 +31,39 @@ namespace MarchingCubes
 		public float getValue(int x, int y, int z)
 		{
 			float accumulation = 0;
-			for(int octaveNum = 0; octaveNum < octaves; octaveNum++ )
+			for ( int octaveNum = 0; octaveNum < octaves; octaveNum++ )
 			{
 				int octaveValuesPerGrid = valuesPerGrid[octaveNum];
 				int gridX = x / octaveValuesPerGrid;
 				int gridY = y / octaveValuesPerGrid;
 				int gridZ = z / octaveValuesPerGrid;
 
-				int val000 = getGridValue(gridX, gridY, gridZ);
-				int val100 = getGridValue(gridX + 1, gridY, gridZ);
-				int val010 = getGridValue(gridX, gridY + 1, gridZ);
-				int val110 = getGridValue(gridX + 1, gridY + 1, gridZ);
-				int val001 = getGridValue(gridX, gridY, gridZ + 1);
-				int val101 = getGridValue(gridX + 1, gridY, gridZ + 1);
-				int val011 = getGridValue(gridX, gridY + 1, gridZ + 1);
-				int val111 = getGridValue(gridX + 1, gridY + 1, gridZ + 1);
-				
+				int val000 = getGridValue( gridX, gridY, gridZ );
+				int val100 = getGridValue( gridX + 1, gridY, gridZ );
+				int val010 = getGridValue( gridX, gridY + 1, gridZ );
+				int val110 = getGridValue( gridX + 1, gridY + 1, gridZ );
+				int val001 = getGridValue( gridX, gridY, gridZ + 1 );
+				int val101 = getGridValue( gridX + 1, gridY, gridZ + 1 );
+				int val011 = getGridValue( gridX, gridY + 1, gridZ + 1 );
+				int val111 = getGridValue( gridX + 1, gridY + 1, gridZ + 1 );
+
+				if ( x < 0 )
+				{
+					x *= -1;
+					gridX *= -1;
+				}
+				if ( y < 0 )
+				{
+					y *= -1;
+					gridY *= -1;
+				}
+				if ( z < 0 )
+				{
+					z *= -1;
+					gridZ *= -1;
+				}
+
+
 				float offsetX = sCurve( (x - (gridX * octaveValuesPerGrid)) / (float)octaveValuesPerGrid );
 				float offsetY = sCurve( (y - (gridY * octaveValuesPerGrid)) / (float)octaveValuesPerGrid );
 				float offsetZ = sCurve( (z - (gridZ * octaveValuesPerGrid)) / (float)octaveValuesPerGrid );
