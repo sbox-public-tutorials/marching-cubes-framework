@@ -8,6 +8,8 @@ using System.Diagnostics;
 
 namespace MarchingCubes
 {
+	//TODO: Map destruction is 1: obviously inefficient.
+	//2: Doesnt respawn nearby chunks, so you can have a gap in the mesh.
 	partial class MarchingCubesPlayer : Player
 	{
 		private const int maxVertexCount = 1 << 16;
@@ -44,6 +46,7 @@ namespace MarchingCubes
 
 			SimulateActiveChild( cl, ActiveChild );
 
+			//Main loop to generate new undiscovered chunks
 			if(true)
 			{
 				//Compute grid-coords for the noise
@@ -55,7 +58,7 @@ namespace MarchingCubes
 				for ( int i = -2; i <= 2; i++ )
 				{
 					for ( int j = -2; j <= 2; j++ )
-					{
+					{ 
 						int xUsing = x + i;
 						int yUsing = y + j;
 
@@ -64,7 +67,6 @@ namespace MarchingCubes
 						{
 							//If not, build the meshes, and add an entry signaling that the coordinate is built.
 							ModelEntity e = generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 1 , (xUsing * 31) + 31, (yUsing * 31) + 31, 62 );
-							//generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 + 1984 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 32, (xUsing * 31) + 31, (yUsing * 31) + 31, 62 );
 							Log.Info( "X,y: " + xUsing + ", " + yUsing );
 							generatedMap[(xUsing, yUsing)] = e;
 						}
@@ -73,132 +75,15 @@ namespace MarchingCubes
 				}
 			}
 			
-
-			if ( Input.Pressed( InputButton.Attack1 ) )
-			{
-				if(false)
-				{
-					Stopwatch st = new Stopwatch();
-					int n = 500_000;
-					float accumulator = 0;
-					st.Start();
-					for(int i = 0; i < n; i++ )
-					{
-						accumulator += Noise.Perlin( i / (float)n, 0, 0 );
-					}
-					st.Stop();
-					Log.Info( "Perlin Took: " + st.ElapsedMilliseconds + "ms." );
-
-					st.Reset();
-
-					accumulator = 0; 
-					SimpleSlerpNoise ssn = new SimpleSlerpNoise( 0, new int[] { 1, 8, 16 }, new float[] { 0.01f, 0.25f, 0.74f } );
-					st.Start();
-					for ( int i = 0; i < n; i++ )
-					{
-						accumulator += ssn.getValue( i, 0, 0 );
-					}
-					st.Stop();
-					Log.Info( "DIY Took: " + st.ElapsedMilliseconds + "ms." );
-				}
-
-				if(false)
-				{
-					Vector3 position = EyePos + EyeRot.Forward * 512;
-					Stopwatch sw = new Stopwatch();
-					float accumulation = 0.0f;
-					sw.Start();
-					for ( int y = 0; y < 100_000; y++ )
-					{
-						for ( int x = 0; x < 1; x++ )
-						{
-
-							SimpleSlerpNoise ssn = new SimpleSlerpNoise( 0, new int[] { 1, 2, 8, 16 }, new float[] { 0.02f, 0.02f, 0.3f, 0.66f } );
-							float val = ssn.getValue( x, y, 0 );
-
-							/*
-							float val = Noise.Perlin( x / 25f, y / 25f, 0 );
-							*/
-
-							/*
-							float val = 0;
-							int multiplier = 64;
-							float amplitude = 0.5f;
-							float lacunarity = 1.8f;
-							float persistence = 1.0f;
-							float x1 = (float) x / multiplier;
-							float y1 = (float) y / multiplier;
-							for ( int n = 0; n < 5; n++ )
-							{
-								val += Noise.Perlin( x1, y1, 0 ) * amplitude;
-								x1 *= lacunarity;
-								y1 *= lacunarity;
-								amplitude *= persistence;
-							}
-							*/
-
-							val += 1f;
-							val /= 2f;
-							accumulation += val;
-							//DebugOverlay.Sphere( position + new Vector3( x, y, 0 ) * 64, 32, new Color( val, val, val ), true, 2.5f );
-						}
-					}
-					sw.Stop();
-					Log.Info( "Took: " + sw.ElapsedMilliseconds + "ms." );
-				}
-
-				if(false)
-				{
-					Stopwatch sw = new Stopwatch();
-					float accumulation = 0.0f;
-					SimpleSlerpNoise ssn = new SimpleSlerpNoise( 0, new int[] { 1, 2, 8, 16 }, new float[] { 0.02f, 0.02f, 0.3f, 0.66f } );
-
-					sw.Start();
-					for ( int i = 0; i < 30; i++ )
-					{
-						for ( int j = 0; j < 30; j++ )
-						{
-							for ( int k = 0; k < 30; k++ )
-							{
-								//Noise.Perlin( i, 0, 0 );
-								accumulation += ssn.getValue( i, j, k );
-							}
-						}
-					}
-					sw.Stop();
-					float calibration = 18;
-					Log.Info( "Took: " + (sw.ElapsedMilliseconds - calibration) + "ms." );
-					Log.Info( "Internal took " + (ssn.timer.ElapsedMilliseconds - calibration) + "ms." );
-				}
-
-				/*
-				if(true && IsClient)
-				{
-					for(int i = 0; i < 20; i++ )
-					{
-						Log.Info(SimpleSlerpNoise.lcg( 102191, 0, 3, i ) );
-					}
-				}
-				*/
-
-				if(false)
-				{
-					Vector3 position = EyePos + EyeRot.Forward * 512;
-					generateMarchingCubes( position, 0, 0, 0, 31, 31, 31 );
-				}
-			}
-
-
-
-
+			//Left click to destroy terrain.
+			//BUG: this seems to not work when you click into negative positions.
+			//Also using eyeRot sucks and doesn't align to player's crosshair.
 			if ( Input.Pressed( InputButton.Attack1 ) )
 			{
 				ThirdPersonCamera tpc = ((ThirdPersonCamera)this.Camera);
 				Vector3 pos = tpc.Pos;
 				Vector3 dir = tpc.Rot.Forward;
-				//DebugOverlay.Line( pos, pos + (dir * 1000), 0.25f, true );
 
-				//TraceResult tr = Sandbox.Trace.Ray( pos, pos + dir * 999999 ).UseHitboxes().Run();
 				TraceResult tr = Sandbox.Trace.Ray( EyePos + EyeRot.Forward * 64, EyePos + EyeRot.Forward * 9999 ).Run();
 
 				if ( tr.Hit )
@@ -211,8 +96,7 @@ namespace MarchingCubes
 
 					int worldMapX = (int)(tr.EndPos.x / 1984);
 					int worldMapY = (int)(tr.EndPos.y / 1984);
-					//Log.Info( worldMapX );
-					//Log.Info( worldMapY );
+
 					Vector3 thePos = new Vector3( worldMapX * 1984, worldMapY * 1984, 4096 );
 
 					for(int i = -1; i <= 1; i++ )
@@ -226,8 +110,6 @@ namespace MarchingCubes
 							}
 						}
 					}
-
-					//Log.Info( tr.EndPos );
 
 					ModelEntity a1 = generatedMap[(worldMapX, worldMapY)];
 
@@ -260,6 +142,7 @@ namespace MarchingCubes
 				{
 					for ( int k = 0; k < points.GetLength( 2 ); k++ )
 					{
+						//Global grid coordinates for each voxel.
 						int globalX = i + x0 - 1;
 						int globalY = j + y0 - 1;
 						int globalZ = k + z0 - 1;
@@ -267,7 +150,7 @@ namespace MarchingCubes
 
 						if ( overrideMap.ContainsKey( (globalX, globalY, globalZ) ) )
 						{
-							Log.Info( "Found a hit: " + globalX + ", " + globalY + ", " + globalZ + " : " + overrideMap[(globalX, globalY, globalZ)] );
+							//Log.Info( "Found a hit: " + globalX + ", " + globalY + ", " + globalZ + " : " + overrideMap[(globalX, globalY, globalZ)] );
 							points[i, j, k] = overrideMap[(globalX, globalY, globalZ)];
 							continue;
 						}
@@ -277,7 +160,7 @@ namespace MarchingCubes
 							//Hopefully something can be done about this.
 
 							//float val = Noise.Perlin( i / 8f, j / 8f, k / 8f );
-							float val = ssn.getValue( i + x0 - 1, j + y0 - 1, k + z0 - 1 );
+							float val = ssn.getValue( globalX, globalY, globalZ );
 							//Convert [-1,1] range to [0,1]
 							val += 1f;
 							val /= 2f;
@@ -287,15 +170,10 @@ namespace MarchingCubes
 							//Uncomment this line if you want a giant ball of laggy spheres to visualize the noise.
 							//DebugOverlay.Sphere( position + new Vector3( i, j, k ) * 64, 32, new Color(val, val, val), true, 5f );
 						}
-
-
 					}
 				}
 			}
-			//a.Stop();
-			//Log.Info( "Numbers took: " + a.ElapsedMilliseconds +"ms." );
-			//a.Reset();
-			//a.Start();
+
 			//Material material = Material.Load( "materials/dev/gray_25.vmat" );
 			Material material = Material.Load( "materials/dev/dev_measuregeneric01.vmat" );
 			Mesh mesh = new Mesh( material );
@@ -379,9 +257,9 @@ namespace MarchingCubes
 								if ( l % 3 == 0 )
 								{
 									debugC = new Color( (float)Rand.Double(), (float)Rand.Double(), (float)Rand.Double() );
-									Vector3 pos1 = (Triangulation.offsets[Triangulation.vertexTable[index, l + 0]] * 64);// + (new Vector3( i, j, k ) * 64);
-									Vector3 pos2 = (Triangulation.offsets[Triangulation.vertexTable[index, l + 1]] * 64);// + (new Vector3( i, j, k ) * 64);
-									Vector3 pos3 = (Triangulation.offsets[Triangulation.vertexTable[index, l + 2]] * 64);// + (new Vector3( i, j, k ) * 64);
+									Vector3 pos1 = (Triangulation.offsets[Triangulation.vertexTable[index, l + 0]] * 64);
+									Vector3 pos2 = (Triangulation.offsets[Triangulation.vertexTable[index, l + 1]] * 64);
+									Vector3 pos3 = (Triangulation.offsets[Triangulation.vertexTable[index, l + 2]] * 64);
 									normalToDraw = Vector3.Cross(pos2 - pos1, pos3 - pos1).Normal;
 
 									//Uncomment these lines to visualize all face normals.
@@ -393,18 +271,15 @@ namespace MarchingCubes
 										DebugOverlay.Line( bp + avgOffset, bp + avgOffset + (normalToDraw * 32), debugC, 9999f, true );
 									}
 									*/
-									
-
 								}
 
 								Vector3 pos = (Triangulation.offsets[triIndex] * 64) + (new Vector3( i, j, k ) * 64);
 								collisionVerticies.Add( pos );
-								//Vector3 norm = Triangulation.offsets[triIndex].Normal;
 								Vector3 norm = normalToDraw;
 
 								//Uncomment these to visualize all vertex normals.
 								//Vector3 basePos = position + pos;
-								//DebugOverlay.Line( basePos, basePos + (norm.Normal * 32), debugC, 9999f, true );
+								//DebugOverlay.Line( basePos, basePos + (norm * 32), debugC, 9999f, true );
 
 								Vector3 tan;
 								//Since sometimes the normal can be straight up,
@@ -419,9 +294,9 @@ namespace MarchingCubes
 									tan = Vector3.Cross( norm, Vector3.Up );
 								}
 								Color c = Color.White;
-
+								//Texcoords have yet to be worked out, I figure eventually it will need to be fixed.
+								//But at the moment solid colors are fine so I am not going to worry about it.
 								Vector2 texCoords = Vector2.Zero;
-
 								SuperVertex vertex = new SuperVertex( pos, tan, norm, c, texCoords );
 								verticies.Add( vertex );
 								numTris++;
@@ -432,7 +307,6 @@ namespace MarchingCubes
 			}
 			//Since the collisionVerticies list is in the same order as
 			//the visual mesh is, it is in the correct order.
-
 			//Therefore, the indicies for each is just 0, 1, 2. . . 
 			//For every vertex.
 			int[] indicies = new int[numTris];
@@ -459,8 +333,6 @@ namespace MarchingCubes
 				return e;
 			}
 			return null;
-			//a.Stop();
-			//Log.Info( "Everything else took: " + a.ElapsedMilliseconds + "ms." );
 
 		}
 
