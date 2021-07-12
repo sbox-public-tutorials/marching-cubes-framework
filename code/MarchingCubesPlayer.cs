@@ -42,6 +42,7 @@ namespace MarchingCubes
 
 			SimulateActiveChild( cl, ActiveChild );
 
+			if(true)
 			{
 				//Compute grid-coords for the noise
 				int x = (int)(Position.x / 1984);
@@ -176,6 +177,12 @@ namespace MarchingCubes
 					}
 				}
 				*/
+
+				if(false)
+				{
+					Vector3 position = EyePos + EyeRot.Forward * 512;
+					generateMarchingCubes( position, 0, 0, 0, 31, 31, 31 );
+				}
 				
 			}
 		}
@@ -283,6 +290,9 @@ namespace MarchingCubes
 							index |= 128;
 						}
 
+						Color debugC = Color.Black;
+						Vector3 normalToDraw = Vector3.Zero;
+
 						bool flag = true;
 						for ( int l = 0; l < 16 && flag; l++ )
 						{
@@ -293,19 +303,41 @@ namespace MarchingCubes
 							}
 							else
 							{
+								if ( l % 3 == 0 )
+								{
+									debugC = new Color( (float)Rand.Double(), (float)Rand.Double(), (float)Rand.Double() );
+									Vector3 pos1 = (Triangulation.offsets[Triangulation.vertexTable[index, l + 0]] * 64);// + (new Vector3( i, j, k ) * 64);
+									Vector3 pos2 = (Triangulation.offsets[Triangulation.vertexTable[index, l + 1]] * 64);// + (new Vector3( i, j, k ) * 64);
+									Vector3 pos3 = (Triangulation.offsets[Triangulation.vertexTable[index, l + 2]] * 64);// + (new Vector3( i, j, k ) * 64);
+									normalToDraw = Vector3.Cross(pos2 - pos1, pos3 - pos1).Normal;
+
+									//Uncomment these lines to visualize all face normals.
+									/*
+									if(i%32 < 16 && j%32 < 16) //You can change this to rendering lag
+									{
+										Vector3 avgOffset = (pos1 + pos2 + pos3) / 3f;
+										Vector3 bp = position + (new Vector3( i, j, k ) * 64);
+										DebugOverlay.Line( bp + avgOffset, bp + avgOffset + (normalToDraw * 32), debugC, 9999f, true );
+									}
+									*/
+									
+
+								}
+
 								Vector3 pos = (Triangulation.offsets[triIndex] * 64) + (new Vector3( i, j, k ) * 64);
 								collisionVerticies.Add( pos );
-								Vector3 norm = Triangulation.offsets[triIndex].Normal;
+								//Vector3 norm = Triangulation.offsets[triIndex].Normal;
+								Vector3 norm = normalToDraw;
 
-								Vector3 basePos = position + pos;
-								//Uncomment this to visualize all vertex normals.
-								//DebugOverlay.Line( basePos, basePos + (norm.Normal * 32), 9999f, true );
+								//Uncomment these to visualize all vertex normals.
+								//Vector3 basePos = position + pos;
+								//DebugOverlay.Line( basePos, basePos + (norm.Normal * 32), debugC, 9999f, true );
 
 								Vector3 tan;
 								//Since sometimes the normal can be straight up,
 								//we cant always cross the normal with Up to get
 								//a tangent. So we have to check.
-								if ( norm.Equals( Vector3.Up ) )
+								if ( norm.Equals( Vector3.Up ) || norm.Equals( Vector3.Down ))
 								{
 									tan = Vector3.Cross( norm, Vector3.Right );
 								}
