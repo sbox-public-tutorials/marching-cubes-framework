@@ -59,3 +59,4 @@ sysinfo.txt
 crashlytics-build.properties
 
 *.cache
+code/obj/Debug/net5.0/marching-cubes-framework.assets.cache
