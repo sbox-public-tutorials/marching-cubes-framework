@@ -488,6 +488,26 @@
             The engine wants to create this entity by name.
             </summary>
         </member>
+        <member name="P:Sandbox.AnimEntity.Sequence">
+            <summary>
+            The currently playing sequence/animation
+            </summary>
+        </member>
+        <member name="P:Sandbox.AnimEntity.UseAnimGraph">
+            <summary>
+            Allows the entity to not use the anim graph so it can play sequences directly
+            </summary>
+        </member>
+        <member name="M:Sandbox.AnimEntity.HasAnimGraph">
+            <summary>
+            Whether this entity's model has an anim graph or not
+            </summary>
+        </member>
+        <member name="P:Sandbox.AnimEntity.PlaybackRate">
+            <summary>
+            Playback rate of the animations on this entity
+            </summary>
+        </member>
         <member name="P:Sandbox.AnimEntity.RootMotion">
             <summary>
             Experimental root motion velocity for anim graphs that use root motion
@@ -981,6 +1001,11 @@
             Party invite has been created
             </summary>
         </member>
+        <member name="M:Sandbox.Internal.MenuTools.PackageQuery(Sandbox.Package.Type,System.String,System.String)">
+            <summary>
+            Find package information
+            </summary>
+        </member>
         <member name="T:Sandbox.Internal.NetworkAtomic`1">
             <summary>
             A fixed size Play Old Data variable. Can be a built in type or a struct.
@@ -1164,6 +1189,11 @@
         <member name="M:Sandbox.ModelEntity.OnCarryDrop(Sandbox.Entity)">
             <summary>
             Allow the entity to do what it wants when it's removed from the inventory
+            </summary>
+        </member>
+        <member name="M:Sandbox.ModelEntity.SetColor(System.String)">
+            <summary>
+            Sets the color of this entity. Format is "255 255 255 255".
             </summary>
         </member>
         <member name="P:Sandbox.ModelEntity.GlowColor">
@@ -2290,7 +2320,6 @@
         <member name="M:Sandbox.Mesh.CreateVertexBuffer``1(System.Int32,Sandbox.VertexAttribute[],System.Span{``0})">
             <summary>
             Create a vertex buffer with a number of vertices, an array of vertex attributes can be passed in
-            Otherwise it will try to guess the vertex layout
             </summary>
         </member>
         <member name="M:Sandbox.Mesh.SetVertexBufferData``1(System.Span{``0},System.Int32)">
@@ -2373,6 +2402,11 @@
             Add a bunch of meshes to a LOD group
             </summary>
         </member>
+        <member name="M:Sandbox.ModelBuilder.AddBone(System.String,Vector3,Rotation,System.String)">
+            <summary>
+            Add a bone to the skeleton
+            </summary>
+        </member>
         <member name="M:Sandbox.ModelBuilder.Create">
             <summary>
             Finish creation of model
@@ -2430,6 +2464,11 @@
             <summary>
             Load a texture asyncronously. Will return when the texture is loaded and valid.
             This is useful when loading textures from the web.
+            </summary>
+        </member>
+        <member name="F:Sandbox.TextureLoader.ImageUrl.Loaded">
+            <summary>
+            For textures loaded from the web we want to keep them around a bit longer
             </summary>
         </member>
         <member name="M:Sandbox.VertexBuffer.Add(Sandbox.Vertex)">
@@ -2574,6 +2613,46 @@
             The direction of the trace ray
             </summary>
         </member>
+        <member name="P:Sandbox.UI.DataSource.BaseDataSource.PropertyName">
+            <summary>
+            Property on Panel to bind to.
+            </summary>
+        </member>
+        <member name="F:Sandbox.UI.DataSource.BaseDataSource.Hash">
+            <summary>
+            Hash to store the last value in, to avoid unnesssary updates
+            </summary>
+        </member>
+        <member name="P:Sandbox.UI.DataSource.BaseDataSource.Value">
+            <summary>
+            Implementable to get/set the value from the bound object
+            </summary>
+        </member>
+        <member name="M:Sandbox.UI.DataSource.BaseDataSource.TryUpdateHash(System.Object)">
+            <summary>
+            Returns true if the hash changed
+            </summary>
+        </member>
+        <member name="M:Sandbox.UI.DataSource.BaseDataSource.Tick(Sandbox.UI.Panel)">
+            <summary>
+            Set the panel property from whatever the value is
+            </summary>
+        </member>
+        <member name="T:Sandbox.UI.DataSource.ObjectProperty">
+            <summary>
+            Bind a panel property to an object property ([Target].[TargetProperty])
+            </summary>
+        </member>
+        <member name="F:Sandbox.UI.DataSource.ObjectProperty.Target">
+            <summary>
+            The target object to find the property
+            </summary>
+        </member>
+        <member name="F:Sandbox.UI.DataSource.ObjectProperty.TargetProperty">
+            <summary>
+            Target source, ie "PlayerName"
+            </summary>
+        </member>
         <member name="M:Sandbox.UI.Clipboard.SetText(System.String)">
             <summary>
             Sets the clipboard text
@@ -2625,6 +2704,16 @@
         <member name="M:Sandbox.UI.SkiaTextBlock.RebuildTexture(System.Single,System.Single)">
             <summary>
             Actually recreate the texture
+            </summary>
+        </member>
+        <member name="P:Sandbox.UI.Input.Hovered">
+            <summary>
+            Panel we're currently hovered over
+            </summary>
+        </member>
+        <member name="P:Sandbox.UI.Input.Active">
+            <summary>
+            Panel we're currently pressing down
             </summary>
         </member>
         <member name="M:Sandbox.UI.Input.SetCursor(System.String)">
@@ -2723,6 +2812,16 @@
             Sort the children using this comparison function
             </summary>
         </member>
+        <member name="M:Sandbox.UI.Panel.IsAncestor(Sandbox.UI.Panel)">
+            <summary>
+            Is the passed panel a parent, grandparent etc
+            </summary>
+        </member>
+        <member name="P:Sandbox.UI.Panel.Class">
+            <summary>
+            A list of classes applied to this panel
+            </summary>
+        </member>
         <member name="M:Sandbox.UI.Panel.AddClass(System.String)">
             <summary>
             
@@ -2743,6 +2842,17 @@
             Dirty the styles of this class and its children recursively.
             </summary>
         </member>
+        <member name="P:Sandbox.UI.Panel.ElementName">
+            <summary>
+            The element name. If you've created this Panel via a template this will be whatever the element
+            name is on there. If not then it'll be the name of the class (ie Panel, Button)
+            </summary>
+        </member>
+        <member name="P:Sandbox.UI.Panel.PseudoClass">
+            <summary>
+            Special flags used by the styling system for hover, active etc..
+            </summary>
+        </member>
         <member name="M:Sandbox.UI.Panel.Switch(Sandbox.UI.PseudoClass,System.Boolean)">
             <summary>
             Switch a pseudo class on or off
@@ -2758,21 +2868,21 @@
             Called after the parent has changed
             </summary>
         </member>
-        <member name="M:Sandbox.UI.Panel.UpdateDataBind(System.Boolean)">
+        <member name="M:Sandbox.UI.Panel.ScreenPositionToPanelDelta(Vector2)">
             <summary>
-            Loop all the binds and if their values have changed, update.
+            Convert a point from the screen to a point representing a delta on this panel where
+            the top left is [0,0] and the bottom right is [1,1]
             </summary>
         </member>
-        <member name="M:Sandbox.UI.Panel.OnDataBindChanged(System.Object)">
+        <member name="M:Sandbox.UI.Panel.ScreenPositionToPanelPosition(Vector2)">
             <summary>
-            The value in DataBind has changed. It's changed to this value.
+            Convert a point from the screen to a position relative to the top left of this panel
             </summary>
         </member>
-        <member name="M:Sandbox.UI.Panel.SetDataObject(System.Object)">
+        <member name="M:Sandbox.UI.Panel.CreateValueEvent(System.String,System.Object)">
             <summary>
-            Update the panel using the provided data object. This is used for things like
-            virtual scrollers. Your panel implementation should correctly check and convert 
-            the object then fill the panel data according to its contents.
+            Call this when the value has changed due to user input etc. This updates any
+            bindings, backwards.
             </summary>
         </member>
         <member name="M:Sandbox.UI.Panel.Delete(System.Boolean)">
@@ -2807,6 +2917,16 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Sandbox.UI.Panel.PushLayer(Sandbox.UI.PanelRenderer)">
+            <summary>
+            Called before rendering this panel
+            </summary>
+        </member>
+        <member name="M:Sandbox.UI.Panel.PopLayer(Sandbox.UI.PanelRenderer)">
+            <summary>
+            called after rendering this panel
+            </summary>
+        </member>
         <member name="F:Sandbox.UI.Panel.YogaScale">
             <summary>
             Any values fed to Yoga are multipled by this value, any returned are divided by this value.
@@ -2840,6 +2960,16 @@
             Binds that are generated via @ attributes in the templating system
             </summary>
         </member>
+        <member name="M:Sandbox.UI.Panel.Bind(System.String,System.Object,System.String)">
+            <summary>
+            Bind to the target object's property
+            </summary>
+        </member>
+        <member name="M:Sandbox.UI.Panel.Bind(Sandbox.UI.DataSource.BaseDataSource)">
+            <summary>
+            Bind to the data source
+            </summary>
+        </member>
         <member name="M:Sandbox.UI.Panel.SetRefProperty(Sandbox.UI.Panel,System.String,System.String)">
             <summary>
             Sets the field on context
@@ -2848,6 +2978,12 @@
         <member name="M:Sandbox.UI.Panel.SetContent(System.String)">
             <summary>
             Called by the templating system when an element has content between its tags.
+            </summary>
+        </member>
+        <member name="M:Sandbox.UI.Panel.OnTemplateElement(Sandbox.Html.INode)">
+            <summary>
+            If you return true to this call the children from this element won't be created
+            because we'll assume you're doing it youself in your control code
             </summary>
         </member>
         <member name="M:Sandbox.UI.Panel.SetTemplate(System.String)">
@@ -2891,21 +3027,6 @@
         <member name="M:Sandbox.UI.Panel.SkipTransitions">
             <summary>
             Any traisitons running, or about to run, will jump straight to the end
-            </summary>
-        </member>
-        <member name="F:Sandbox.UI.PropertyBind.Context">
-            <summary>
-            The panel creating the bind, look here for Source
-            </summary>
-        </member>
-        <member name="F:Sandbox.UI.PropertyBind.Target">
-            <summary>
-            Target property, ie "text"
-            </summary>
-        </member>
-        <member name="F:Sandbox.UI.PropertyBind.Source">
-            <summary>
-            Target source, ie "PlayerName"
             </summary>
         </member>
         <member name="M:Sandbox.UI.StyleParser.ParseStyles(System.String,Sandbox.UI.Styles)">
@@ -3112,6 +3233,13 @@
             <summary>
             Easing functions used for transitions
             </summary>
+        </member>
+        <member name="T:Sandbox.Easing.Function">
+            <summary>
+            An easing function that transforms the linear input into non linear output.
+            </summary>
+            <param name="delta">A linear input value from 0 to 1</param>
+            <returns>The resulting non linear output value, from 0 to 1</returns>
         </member>
         <member name="M:Sandbox.Easing.AddFunction(System.String,Sandbox.Easing.Function)">
             <summary>
@@ -3322,7 +3450,7 @@
         <member name="F:NativeEngine.TraceRequest.ResolveEntities">
             <summary>
             If true, we use a slightly slower path in the trace code that checks each entity.
-            This is needed for testing things like Tags, so gets set auomatically if needed.
+            This is needed for testing things like Tags, so gets set automatically if needed.
             </summary>
         </member>
         <member name="M:Managed.SourceClient.Exports.Sandboclient_Physcs_OnObjectCreated(System.IntPtr,System.Int32)">
@@ -3475,6 +3603,11 @@
             Sandbox.ClientEntity.InternalOnNewModel( ... )
             </summary>
         </member>
+        <member name="M:Managed.SourceClient.Exports.Sandbo_ClentE_InternalAnimEvent(System.IntPtr,System.IntPtr,System.Int32,System.Single,Vector3,System.IntPtr)">
+            <summary>
+            Sandbox.ClientEntity.InternalAnimEvent( ... )
+            </summary>
+        </member>
         <member name="M:Managed.SourceClient.Exports.Sandbo_ClentE_InternalAnimEventFootstep(System.IntPtr,Vector3,System.Int32,System.Single)">
             <summary>
             Sandbox.ClientEntity.InternalAnimEventFootstep( ... )
@@ -3525,7 +3658,7 @@
             Sandbox.ClientEntity.InternalOnSetDormant( ... )
             </summary>
         </member>
-        <member name="M:Managed.SourceClient.Exports.Sandbo_ClentE_InternalPhysicsCollisionEvent(System.IntPtr,System.IntPtr,Vector3,Vector3,Vector3,Vector3,Vector3,System.Single,System.Single)">
+        <member name="M:Managed.SourceClient.Exports.Sandbo_ClentE_InternalPhysicsCollisionEvent(System.IntPtr,System.IntPtr,Vector3,Vector3,Vector3,Vector3,Vector3,Vector3,System.Single)">
             <summary>
             Sandbox.ClientEntity.InternalPhysicsCollisionEvent( ... )
             </summary>
@@ -3625,6 +3758,11 @@
             Sandbox.Entity.InternalOnNewModel( ... )
             </summary>
         </member>
+        <member name="M:Managed.SourceClient.Exports.Sandbo_Entity_InternalAnimEvent(System.IntPtr,System.IntPtr,System.Int32,System.Single,Vector3,System.IntPtr)">
+            <summary>
+            Sandbox.Entity.InternalAnimEvent( ... )
+            </summary>
+        </member>
         <member name="M:Managed.SourceClient.Exports.Sandbo_Entity_InternalAnimEventFootstep(System.IntPtr,Vector3,System.Int32,System.Single)">
             <summary>
             Sandbox.Entity.InternalAnimEventFootstep( ... )
@@ -3675,7 +3813,7 @@
             Sandbox.Entity.InternalOnSetDormant( ... )
             </summary>
         </member>
-        <member name="M:Managed.SourceClient.Exports.Sandbo_Entity_InternalPhysicsCollisionEvent(System.IntPtr,System.IntPtr,Vector3,Vector3,Vector3,Vector3,Vector3,System.Single,System.Single)">
+        <member name="M:Managed.SourceClient.Exports.Sandbo_Entity_InternalPhysicsCollisionEvent(System.IntPtr,System.IntPtr,Vector3,Vector3,Vector3,Vector3,Vector3,Vector3,System.Single)">
             <summary>
             Sandbox.Entity.InternalPhysicsCollisionEvent( ... )
             </summary>
@@ -3758,6 +3896,11 @@
         <member name="M:Managed.SourceClient.Exports.Sandbo_GameLo_PhysicsThink">
             <summary>
             Sandbox.GameLoop.PhysicsThink( ... )
+            </summary>
+        </member>
+        <member name="M:Managed.SourceClient.Exports.Sandbo_GameLo_PrePhysicsStep(System.Single)">
+            <summary>
+            Sandbox.GameLoop.PrePhysicsStep( ... )
             </summary>
         </member>
         <member name="M:Managed.SourceClient.Exports.Sandbo_GameLo_PostPhysicsStep(System.Single)">
@@ -3960,6 +4103,11 @@
             Sandbox.ClientEntity.InternalOnNewModel( ... )
             </summary>
         </member>
+        <member name="M:Managed.SourceServer.Exports.Sandbo_ClentE_InternalAnimEvent(System.IntPtr,System.IntPtr,System.Int32,System.Single,Vector3,System.IntPtr)">
+            <summary>
+            Sandbox.ClientEntity.InternalAnimEvent( ... )
+            </summary>
+        </member>
         <member name="M:Managed.SourceServer.Exports.Sandbo_ClentE_InternalAnimEventFootstep(System.IntPtr,Vector3,System.Int32,System.Single)">
             <summary>
             Sandbox.ClientEntity.InternalAnimEventFootstep( ... )
@@ -4010,7 +4158,7 @@
             Sandbox.ClientEntity.InternalOnSetDormant( ... )
             </summary>
         </member>
-        <member name="M:Managed.SourceServer.Exports.Sandbo_ClentE_InternalPhysicsCollisionEvent(System.IntPtr,System.IntPtr,Vector3,Vector3,Vector3,Vector3,Vector3,System.Single,System.Single)">
+        <member name="M:Managed.SourceServer.Exports.Sandbo_ClentE_InternalPhysicsCollisionEvent(System.IntPtr,System.IntPtr,Vector3,Vector3,Vector3,Vector3,Vector3,Vector3,System.Single)">
             <summary>
             Sandbox.ClientEntity.InternalPhysicsCollisionEvent( ... )
             </summary>
@@ -4110,6 +4258,11 @@
             Sandbox.Entity.InternalOnNewModel( ... )
             </summary>
         </member>
+        <member name="M:Managed.SourceServer.Exports.Sandbo_Entity_InternalAnimEvent(System.IntPtr,System.IntPtr,System.Int32,System.Single,Vector3,System.IntPtr)">
+            <summary>
+            Sandbox.Entity.InternalAnimEvent( ... )
+            </summary>
+        </member>
         <member name="M:Managed.SourceServer.Exports.Sandbo_Entity_InternalAnimEventFootstep(System.IntPtr,Vector3,System.Int32,System.Single)">
             <summary>
             Sandbox.Entity.InternalAnimEventFootstep( ... )
@@ -4160,7 +4313,7 @@
             Sandbox.Entity.InternalOnSetDormant( ... )
             </summary>
         </member>
-        <member name="M:Managed.SourceServer.Exports.Sandbo_Entity_InternalPhysicsCollisionEvent(System.IntPtr,System.IntPtr,Vector3,Vector3,Vector3,Vector3,Vector3,System.Single,System.Single)">
+        <member name="M:Managed.SourceServer.Exports.Sandbo_Entity_InternalPhysicsCollisionEvent(System.IntPtr,System.IntPtr,Vector3,Vector3,Vector3,Vector3,Vector3,Vector3,System.Single)">
             <summary>
             Sandbox.Entity.InternalPhysicsCollisionEvent( ... )
             </summary>
@@ -4243,6 +4396,11 @@
         <member name="M:Managed.SourceServer.Exports.Sandbo_GameLo_PhysicsThink">
             <summary>
             Sandbox.GameLoop.PhysicsThink( ... )
+            </summary>
+        </member>
+        <member name="M:Managed.SourceServer.Exports.Sandbo_GameLo_PrePhysicsStep(System.Single)">
+            <summary>
+            Sandbox.GameLoop.PrePhysicsStep( ... )
             </summary>
         </member>
         <member name="M:Managed.SourceServer.Exports.Sandbo_GameLo_PostPhysicsStep(System.Single)">

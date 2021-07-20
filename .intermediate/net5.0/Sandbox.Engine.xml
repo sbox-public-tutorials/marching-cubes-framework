@@ -254,11 +254,6 @@
             Find package information
             </summary>
         </member>
-        <member name="M:Sandbox.Package.Categories">
-            <summary>
-            Find package information
-            </summary>
-        </member>
         <member name="M:Sandbox.Package.FindAsync(System.String)">
             <summary>
             Find the gamemode info. We might already have the information, in which case we'll return a cached version.
@@ -952,6 +947,11 @@
             [Hammer.EditorSprite( "editor/ai_goal_follow.vmat" )]
             </example>
         </member>
+        <member name="T:Hammer.ParticleAttribute">
+            <summary>
+            Tells Hammer that this entity has a particle effect keyvalue that needs to be visualized
+            </summary>
+        </member>
         <member name="T:Hammer.SkipAttribute">
             <summary>
             Don't expose this to Hammer
@@ -960,6 +960,11 @@
         <member name="T:Hammer.SolidAttribute">
             <summary>
             This is a brush based class
+            </summary>
+        </member>
+        <member name="T:Hammer.PathAttribute">
+            <summary>
+            This is a path class
             </summary>
         </member>
         <member name="T:Hammer.SupportsSolidAttribute">

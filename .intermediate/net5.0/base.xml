@@ -89,6 +89,29 @@
             Utility - return the entity we should be spawning particles from etc
             </summary>
         </member>
+        <member name="F:Sandbox.BasePathEntity.PathNodes">
+            <summary>
+            A list of nodes this entity represents, as set up in Hammer.
+            </summary>
+        </member>
+        <member name="M:Sandbox.BasePathEntity.GetPointBetweenNodes(Sandbox.BasePathEntity.PathNode,Sandbox.BasePathEntity.PathNode,System.Single)">
+            <summary>
+            Returns a point on the cubic beizer curve between 2 given nodes
+            </summary>
+            <param name="start">The start node</param>
+            <param name="end">The next node</param>
+            <param name="t">interpolation value from 0 to 1</param>
+            <returns>The position on the curve in world space</returns>
+        </member>
+        <member name="M:Sandbox.BasePathEntity.GetCurveLength(Sandbox.BasePathEntity.PathNode,Sandbox.BasePathEntity.PathNode,System.Int32)">
+            <summary>
+            Returns the approximate length of a curve between 2 nodes.
+            </summary>
+            <param name="start">Start node</param>
+            <param name="end">End node</param>
+            <param name="segments">Number of segments. The higher the value, the more precise (and slower) the result will be.</param>
+            <returns>The approximate length</returns>
+        </member>
         <member name="T:Sandbox.BasePhysics">
             <summary>
             Base entity with phyiscal properties, enables imapct damage and the like
@@ -132,6 +155,16 @@
             Viewmodel specific setup
             </summary>
         </member>
+        <member name="P:Sandbox.Camera.ZNear">
+            <summary>
+            The near Z clip plane
+            </summary>
+        </member>
+        <member name="P:Sandbox.Camera.ZFar">
+            <summary>
+            The far Z clip plane
+            </summary>
+        </member>
         <member name="P:Sandbox.Camera.Ortho">
             <summary>
             Use orthographic projection
@@ -139,7 +172,7 @@
         </member>
         <member name="P:Sandbox.Camera.OrthoSize">
             <summary>
-            Acts as a zoom when ortho is enabled 
+            Acts as a zoom when ortho is enabled
             </summary>
         </member>
         <member name="M:Sandbox.Camera.BuildInput(Sandbox.InputBuilder)">
@@ -264,6 +297,12 @@
             Amount of time, in seconds, after the door has opened before it closes automatically. If the value is set to -1, the door never closes itself.
             </summary>
         </member>
+        <member name="P:Sandbox.EntDoor.Ease">
+            <summary>
+            The easing function for both movement and rotation
+            TODO: Expose to hammer in a nice way
+            </summary>
+        </member>
         <member name="P:Sandbox.EntDoor.OnLockedUse">
             <summary>
             Fired when a player tries to open/close this door with +use, but it's locked
@@ -365,29 +404,30 @@
             Toggle this func_brush
             </summary>
         </member>
-        <member name="F:Sandbox.FuncButton.Flags.NoMoving">
+        <member name="P:Sandbox.FuncButton.MoveDir">
             <summary>
-            This button will not move when pressed
+            Specifies the direction to move in when the button is used, or axis of rotation for rotating buttons.
             </summary>
         </member>
-        <member name="P:Sandbox.FuncButton.MoveAngle">
-            <summary>
-            Specifies the direction of motion to move when the button is used
-            </summary>
-        </member>
-        <member name="P:Sandbox.FuncButton.MoveAngleIsLocal">
+        <member name="P:Sandbox.FuncButton.MoveDirIsLocal">
             <summary>
             If checked, the movement direction angle is in local space and should be rotated by the entity's angles after spawning.
             </summary>
         </member>
-        <member name="P:Sandbox.FuncButton.DelayBeforeReset">
+        <member name="P:Sandbox.FuncButton.MoveDirType">
             <summary>
-            Amount of time, in seconds, after the button has been pressed before it returns to the starting position. Once it has returned, it can be used again. If the value is set to -1, the button never returns.
+            Movement type of the button.
             </summary>
         </member>
-        <member name="P:Sandbox.FuncButton.Lip">
+        <member name="P:Sandbox.FuncButton.ResetDelay">
             <summary>
-            The amount, in inches, of the button to leave sticking out of the wall it recedes into when pressed. Negative values make the button recede even further into the wall.
+            Amount of time, in seconds, after the button has been fully pressed before it starts to return to the starting position. Once it has returned, it can be used again. If the value is set to -1, the button never returns.
+            </summary>
+        </member>
+        <member name="P:Sandbox.FuncButton.Distance">
+            <summary>
+            Moving button: The amount, in inches, of the button to leave sticking out of the wall it recedes into when pressed. Negative values make the button recede even further into the wall.
+            Rotating button: The amount, in degrees, that the button should rotate when it's pressed.
             </summary>
         </member>
         <member name="P:Sandbox.FuncButton.Speed">
@@ -403,6 +443,12 @@
         <member name="P:Sandbox.FuncButton.LockedSound">
             <summary>
             Sound played when the button is pressed and is locked
+            </summary>
+        </member>
+        <member name="P:Sandbox.FuncButton.Ease">
+            <summary>
+            The easing function for both movement and rotation
+            TODO: Expose to hammer in a nice way
             </summary>
         </member>
         <member name="P:Sandbox.FuncButton.OnUseLocked">
@@ -450,61 +496,6 @@
             Simulates the button being pressed
             </summary>
         </member>
-        <member name="P:Sandbox.FuncButtonRotating.DelayBeforeReset">
-            <summary>
-            Amount of time, in seconds, after the button has been pressed before it returns to the starting position. Once it has returned, it can be used again. If the value is set to -1, the button never returns.
-            </summary>
-        </member>
-        <member name="P:Sandbox.FuncButtonRotating.Degrees">
-            <summary>
-            The amount, in degrees, that the button should rotate when it's pressed.
-            </summary>
-        </member>
-        <member name="P:Sandbox.FuncButtonRotating.Speed">
-            <summary>
-            The speed that the button rotates, in degrees per second.
-            </summary>
-        </member>
-        <member name="P:Sandbox.FuncButtonRotating.UnlockedSound">
-            <summary>
-            Sound played when the button is pressed and is unlocked
-            </summary>
-        </member>
-        <member name="P:Sandbox.FuncButtonRotating.LockedSound">
-            <summary>
-            Sound played when the button is pressed and is locked
-            </summary>
-        </member>
-        <member name="P:Sandbox.FuncButtonRotating.OnUseLocked">
-            <summary>
-            Fired when the button is used while locked
-            </summary>
-        </member>
-        <member name="M:Sandbox.FuncButtonRotating.OnUse(Sandbox.Entity)">
-            <summary>
-            A player has pressed this
-            </summary>
-        </member>
-        <member name="P:Sandbox.FuncButtonRotating.OnDamaged">
-            <summary>
-            Fired when the button is damaged
-            </summary>
-        </member>
-        <member name="P:Sandbox.FuncButtonRotating.OnPressed">
-            <summary>
-            Fired when the button is pressed
-            </summary>
-        </member>
-        <member name="P:Sandbox.FuncButtonRotating.OnIn">
-            <summary>
-            Fired when the button reaches the in/pressed position
-            </summary>
-        </member>
-        <member name="P:Sandbox.FuncButtonRotating.OnOut">
-            <summary>
-            Fired when the button reaches the out/released position
-            </summary>
-        </member>
         <member name="P:Sandbox.FuncPhysbox.PropData">
             <summary>
             Physical properties of this physbox
@@ -513,6 +504,11 @@
         <member name="P:Sandbox.FuncPhysbox._health">
             <summary>
             Amount of damage this entity can take before breaking
+            </summary>
+        </member>
+        <member name="P:Sandbox.FuncPhysbox.OnDamaged">
+            <summary>
+            Fired when the entity gets damaged
             </summary>
         </member>
         <member name="M:Sandbox.FuncPhysbox.Wake">
@@ -548,7 +544,7 @@
             <param name="target">The target transform</param>
             <param name="seconds">How many seconds to take to move to target transform</param>
             <param name="easing">If set, the easing funtion</param>
-            <returns>Whether we successded to move to given target or not</returns>
+            <returns>Whether we successded moving to given target or not</returns>
         </member>
         <member name="M:Sandbox.KeyframeEntity.TryKeyframeTo(Transform)">
             <summary>
@@ -562,7 +558,26 @@
             <param name="deltaTarget">The target local position</param>
             <param name="seconds">How many seconds to take to move to target transform</param>
             <param name="easing">If set, the easing funtion</param>
-            <returns>Whether we successded to move to given target or not</returns>
+            <returns>Whether we successded moving to given local target or not</returns>
+        </member>
+        <member name="M:Sandbox.KeyframeEntity.TryLocalKeyframeTo(Vector3)">
+            <summary>
+            Used by KeyframeTo methods to try to move to a given local position
+            </summary>
+        </member>
+        <member name="M:Sandbox.KeyframeEntity.LocalRotateKeyframeTo(Rotation,System.Single,Sandbox.Easing.Function)">
+            <summary>
+            Rotate to a given local rotation in given amount of time
+            </summary>
+            <param name="localTarget">The target local rotation</param>
+            <param name="seconds">How many seconds to take to move to target transform</param>
+            <param name="easing">If set, the easing funtion</param>
+            <returns>Whether we successded rotating to given target or not</returns>
+        </member>
+        <member name="M:Sandbox.KeyframeEntity.TryLocalRotateTo(Rotation)">
+            <summary>
+            Used by LocalRotateKeyframeTo to try to rotate to a given rotation
+            </summary>
         </member>
         <member name="P:Sandbox.ParticleSystemEntity.ParticleSystemName">
             <summary>
@@ -809,7 +824,7 @@
             This is called prediction. If it doesn't match the player resets everything
             to what the server did, that's a prediction error.
             You should really never manually set this on the client - it's replicated so
-            that setting the class on the server will automatically network and set it 
+            that setting the class on the server will automatically network and set it
             on the client.
             </summary>
         </member>
@@ -827,7 +842,7 @@
         </member>
         <member name="P:Sandbox.Player.Animator">
             <summary>
-            The player animator is responsible for positioning/rotating the player and 
+            The player animator is responsible for positioning/rotating the player and
             interacting with the animation graph.
             </summary>
         </member>
@@ -873,8 +888,8 @@
         </member>
         <member name="M:Sandbox.Player.PostCameraSetup(Sandbox.CameraSetup@)">
             <summary>
-            Called after the camera setup logic has run. Allow the player to 
-            do stuff to the camera, or using the camera. Such as positioning entities 
+            Called after the camera setup logic has run. Allow the player to
+            do stuff to the camera, or using the camera. Such as positioning entities
             relative to it, like viewmodels etc.
             </summary>
         </member>
@@ -925,11 +940,21 @@
         </member>
         <member name="T:Sandbox.Prop">
             <summary>
-            A prop that physically simulates as a single rigid body. It can be constrained to other physics objects using hinges 
+            A prop that physically simulates as a single rigid body. It can be constrained to other physics objects using hinges
             or other constraints. It can also be configured to break when it takes enough damage.
             Note that the health of the object will be overridden by the health inside the model, to ensure consistent health game-wide.
             If the model used by the prop is configured to be used as a prop_dynamic (i.e. it should not be physically simulated) then it CANNOT be
             used as a prop_physics. Upon level load it will display a warning in the console and remove itself. Use a prop_dynamic instead.
+            </summary>
+        </member>
+        <member name="P:Sandbox.Prop.OnDamaged">
+            <summary>
+            Fired when the entity gets damaged
+            </summary>
+        </member>
+        <member name="P:Sandbox.Prop.Invulnerable">
+            <summary>
+            This prop won't be able to be damaged for this amount of time
             </summary>
         </member>
         <member name="T:Sandbox.Sky">
@@ -1084,7 +1109,7 @@
             Add a quad to the vertex buffer. Will include indices if they're enabled.
             </summary>
         </member>
-        <member name="M:Sandbox.VertexBufferExtenison.AddCube(Sandbox.VertexBuffer,Vector3,Vector3,Rotation)">
+        <member name="M:Sandbox.VertexBufferExtenison.AddCube(Sandbox.VertexBuffer,Vector3,Vector3,Rotation,Color32)">
             <summary>
             Add a cube to the vertex buffer. Will include indices if they're enabled.
             </summary>
@@ -1376,7 +1401,7 @@
         <member name="M:Sandbox.WalkController.TraceBBox(Vector3,Vector3,System.Single)">
             <summary>
             Traces the current bbox and returns the result.
-            liftFeet will move the start position up by this amount, while keeping the top of the bbox at the same 
+            liftFeet will move the start position up by this amount, while keeping the top of the bbox at the same
             position. This is good when tracing down because you won't be tracing through the ceiling above.
             </summary>
         </member>
@@ -1388,6 +1413,16 @@
         <member name="M:Sandbox.UI.Button.SetText(System.String)">
             <summary>
             Calls Text = value
+            </summary>
+        </member>
+        <member name="P:Sandbox.UI.Checkbox.CheckMark">
+            <summary>
+            The checkmark icon. Although no guarentees it's an icon!
+            </summary>
+        </member>
+        <member name="P:Sandbox.UI.Checkbox.Checked">
+            <summary>
+            Returns true if this checkbox is checked
             </summary>
         </member>
         <member name="P:Sandbox.UI.Tests.GridLayout.ItemSize">
@@ -1461,6 +1496,16 @@
         <member name="P:Sandbox.UI.Tests.VirtualScrollPanel.OnCreateCell">
             <summary>
             Create a new panel. You should add a child to the passed panel (which is the cell).
+            </summary>
+        </member>
+        <member name="M:Sandbox.UI.Popup.Success">
+            <summary>
+            Closes all panels, marks this one as a success and closes it.
+            </summary>
+        </member>
+        <member name="M:Sandbox.UI.Popup.Failure">
+            <summary>
+            Closes all panels, marks this one as a failure and closes it.
             </summary>
         </member>
         <member name="P:Sandbox.UI.TextEntry.AutoComplete">

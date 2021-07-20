@@ -103,14 +103,14 @@
             This is the perfect callback if you're doing something in the finalizer because 
             </summary>
         </member>
-        <member name="T:Sandbox.Hotload.InstanceUpgrader">
+        <member name="T:Sandbox.Hotload.IInstanceUpgrader">
              <summary>
              Interface to implement a custom object instance upgrade process for types that match a condition.
              Instances of any derived types will be created and added to a <see cref="T:Sandbox.Hotload"/> instance that uses
              <see cref="M:Sandbox.Hotload.AddUpgraders(System.Reflection.Assembly)"/> on the declaring assembly of the derived type, unless a
              <see cref="T:Sandbox.Upgraders.DisableAutoCreationAttribute"/> has been specified.
             
-             You can configure which order <see cref="T:Sandbox.Hotload.InstanceUpgrader"/>s are queried by using <see cref="T:Sandbox.Upgraders.UpgraderGroupAttribute"/>,
+             You can configure which order <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/>s are queried by using <see cref="T:Sandbox.Upgraders.UpgraderGroupAttribute"/>,
              <see cref="T:Sandbox.Upgraders.AttemptBeforeAttribute"/> and / or <see cref="T:Sandbox.Upgraders.AttemptAfterAttribute"/>.
              </summary>
         </member>
@@ -182,35 +182,65 @@
             <param name="type">Type to upgrade an instance of.</param>
             <returns>True if this upgrader should attempt to upgrade an instance of the given type.</returns>
         </member>
-        <member name="M:Sandbox.Hotload.InstanceUpgrader.OnTryCreateNewInstance(System.Object,System.Object,Sandbox.Hotload.InstanceUpgrader.CreateNewInstanceResult@)">
+        <member name="M:Sandbox.Hotload.InstanceUpgrader.OnTryCreateNewInstance(System.Object,System.Object,System.Object@)">
             <summary>
-            Attempt to instantiate an upgraded version of the given <paramref name="oldInstance"/>. Returns true if
-            this upgrader was successful in doing so, and the new instance is stored in <see cref="F:Sandbox.Hotload.InstanceUpgrader.CreateNewInstanceResult.NewInstance"/>.
-            Also specifies whether to cache the new instance as the upgraded version of <paramref name="oldInstance"/> by assigning
-            <see cref="F:Sandbox.Hotload.InstanceUpgrader.CreateNewInstanceResult.AddToCache"/>, and also whether that new instance needs more processing to populate any
-            fields, as specified by <see cref="F:Sandbox.Hotload.InstanceUpgrader.CreateNewInstanceResult.ProcessInstanceSchedule"/>. This extra processing will be perfomed
-            by <see cref="M:Sandbox.Hotload.InstanceUpgrader.OnProcessInstance(System.Object,System.Object)"/>.
+            If this upgrader supports upgrading the given <paramref name="oldInstance"/>, returns <value>true</value> and
+            assigns <paramref name="newInstance"/> to be the value that should replace <paramref name="oldInstance"/>. This
+            method doesn't need to copy the inner state of the instance across, but just creates an empty instance to be
+            populated later.
             </summary>
             <remarks>
-            If it's safe for the
-            old instance to keep persisting after the hotload, you can just use that as the new instance. This method
-            should avoid populating fields within the new instance right away if possible, and instead use
-            <see cref="F:Sandbox.Hotload.InstanceUpgrader.CreateNewInstanceResult.ProcessInstanceSchedule"/> to decide when to call <see cref="M:Sandbox.Hotload.InstanceUpgrader.OnProcessInstance(System.Object,System.Object)"/>,
-            which should do the heavy lifting. For value-types however, fields should be fully populated before
-            the new instance is returned by this method, and you can use <see cref="F:Sandbox.Hotload.InstanceUpgrader.ProcessInstanceSchedule.None"/>.
+            <para>
+            It's safe to just directly assign <paramref name="newInstance"/> to <paramref name="oldInstance"/> if the type
+            isn't declared in a replaced assembly.
+            </para>
+            <para>
+            Returning true will cause <see cref="M:Sandbox.Hotload.InstanceUpgrader.OnTryUpgradeInstance(System.Object,System.Object,System.Boolean)"/> to be called immediately after this method, which
+            schedules copying the state of the old instance to the new one.
+            </para>
             </remarks>
-            <param name="oldInstance">An instance that this upgrader should attempt to upgrade.</param>
+            <param name="oldInstance">Instance that should be replaced / upgraded.</param>
             <param name="context">If the instance was found in a field, this will be the containing object.</param>
-            <param name="result">
-            If this method returns true, this should contain the new instance, info about whether it should be cached, and info
-            about when extra field processing should be performed by <see cref="M:Sandbox.Hotload.InstanceUpgrader.OnProcessInstance(System.Object,System.Object)"/>.
+            <param name="newInstance">
+            If this method returns true, this should contain the instance that replaces <paramref name="oldInstance"/>,
+            or <paramref name="oldInstance"/> itself if no replacement is necessary.
             </param>
-            <returns>True if a new instance was created successfully, and stored in <see cref="F:Sandbox.Hotload.InstanceUpgrader.CreateNewInstanceResult.NewInstance"/>.</returns>
+            <returns>True if this upgrader handles the replacement of the given <paramref name="oldInstance"/>.</returns>
+        </member>
+        <member name="M:Sandbox.Hotload.InstanceUpgrader.OnTryUpgradeInstance(System.Object,System.Object,System.Boolean)">
+            <summary>
+            Called immediately after <see cref="M:Sandbox.Hotload.InstanceUpgrader.OnTryCreateNewInstance(System.Object,System.Object,System.Object@)"/> if it returned true, or on instances from fields
+            that can't be re-assigned (see <see cref="P:System.Reflection.FieldInfo.IsInitOnly"/>). This method determines what kind of extra
+            processing is required for the given replacement.
+            </summary>
+            <remarks>
+            <para>
+            In this method we can call things like <see cref="M:Sandbox.Hotload.InstanceUpgrader.ProcessInstance(System.Object,System.Object)"/>, <see cref="M:Sandbox.Hotload.ScheduleInstanceTask(Sandbox.Hotload.IInstanceProcessor,System.Object,System.Object)"/> or
+            <see cref="M:Sandbox.Hotload.ScheduleLateInstanceTask(Sandbox.Hotload.IInstanceProcessor,System.Object,System.Object)"/> to handle copying values from the old instance to the new one.
+            </para>
+            <para>
+            If <paramref name="newInstance"/> should be cached as the canonical replacement for <paramref name="oldInstance"/>,
+            call <see cref="M:Sandbox.Hotload.InstanceUpgrader.AddCachedInstance(System.Object,System.Object)"/> here.
+            </para>
+            <para>
+            If finalization should be suppressed, call <see cref="M:Sandbox.Hotload.InstanceUpgrader.SuppressFinalize(System.Object,System.Object)"/>.
+            </para>
+            </remarks>
+            <param name="oldInstance">Original instance that is being replaced / upgraded from.</param>
+            <param name="newInstance">
+            New instance that replaces <paramref name="oldInstance"/>, or <paramref name="oldInstance"/> itself if no replacement is necessary.
+            </param>
+            <param name="createdElsewhere">
+            True if <paramref name="newInstance"/> was created outside of the hotloading system, for example when the
+            containing field has <see cref="P:System.Reflection.FieldInfo.IsInitOnly"/> set to true. Otherwise, when false, <see cref="M:Sandbox.Hotload.InstanceUpgrader.OnTryCreateNewInstance(System.Object,System.Object,System.Object@)"/>
+            will have been called just before this method.
+            </param>
+            <returns></returns>
         </member>
         <member name="M:Sandbox.Hotload.InstanceUpgrader.OnProcessInstance(System.Object,System.Object)">
             <summary>
             Perform extra field processing on a new instance that has previously been created by this upgrader in
-            <see cref="M:Sandbox.Hotload.InstanceUpgrader.OnTryCreateNewInstance(System.Object,System.Object,Sandbox.Hotload.InstanceUpgrader.CreateNewInstanceResult@)"/>. This is a good place to discover any other instances that should be upgraded
+            <see cref="M:Sandbox.Hotload.InstanceUpgrader.OnTryCreateNewInstance(System.Object,System.Object,System.Object@)"/>. This is a good place to discover any other instances that should be upgraded
             that are stored in <paramref name="oldInstance"/>, which can be upgraded by calling <see cref="M:Sandbox.Hotload.InstanceUpgrader.GetNewInstance(System.Object)"/>.
             </summary>
             <param name="oldInstance">The original instance that was upgraded.</param>
@@ -317,13 +347,13 @@
         </member>
         <member name="F:Sandbox.Upgraders.SkipUpgrader.AdditionalSkipableTypes">
             <summary>
-            Non-generic types that we can safely skip, that we can't add a <see cref="T:Sandbox.Hotload.SkipAttribute"/> to.
+            Types that we can safely skip, that we can't add a <see cref="T:Sandbox.Hotload.SkipAttribute"/> to.
             </summary>
         </member>
         <member name="T:Sandbox.Upgraders.AutoSkipUpgrader">
             <summary>
             Instance upgrader that will try to automatically find types are definitely skippable. This upgrader isn't
-            added automatically, you can enable it by calling <see cref="M:Sandbox.Hotload.AddUpgrader(Sandbox.Hotload.InstanceUpgrader)"/>.
+            added automatically, you can enable it by calling <see cref="M:Sandbox.Hotload.AddUpgrader(Sandbox.Hotload.IInstanceUpgrader)"/>.
             </summary>
             <remarks>
             <para>
@@ -360,48 +390,48 @@
         </member>
         <member name="T:Sandbox.Upgraders.AttemptBeforeAttribute">
             <summary>
-            Use this attribute to specify that a <see cref="T:Sandbox.Hotload.InstanceUpgrader"/> should attempt to process
-            each object before all other specified <see cref="T:Sandbox.Hotload.InstanceUpgrader"/> types.
+            Use this attribute to specify that a <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/> should attempt to process
+            each object before all other specified <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/> types.
             </summary>
         </member>
         <member name="P:Sandbox.Upgraders.AttemptBeforeAttribute.InstanceUpgraderTypes">
             <summary>
-            <see cref="T:Sandbox.Hotload.InstanceUpgrader"/> types that should attempt to process each object after the type this attribute is on.
+            <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/> types that should attempt to process each object after the type this attribute is on.
             </summary>
         </member>
         <member name="M:Sandbox.Upgraders.AttemptBeforeAttribute.#ctor(System.Type[])">
             <summary>
-            Create an instance of <see cref="T:Sandbox.Upgraders.AttemptBeforeAttribute"/> with a list of <see cref="T:Sandbox.Hotload.InstanceUpgrader"/> types.
+            Create an instance of <see cref="T:Sandbox.Upgraders.AttemptBeforeAttribute"/> with a list of <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/> types.
             </summary>
-            <param name="instanceUpgraderTypes">One or more <see cref="T:Sandbox.Hotload.InstanceUpgrader"/> types.</param>
+            <param name="instanceUpgraderTypes">One or more <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/> types.</param>
         </member>
         <member name="T:Sandbox.Upgraders.AttemptAfterAttribute">
             <summary>
-            Use this attribute to specify that a <see cref="T:Sandbox.Hotload.InstanceUpgrader"/> should attempt to process
-            each object after all other specified <see cref="T:Sandbox.Hotload.InstanceUpgrader"/> types.
+            Use this attribute to specify that a <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/> should attempt to process
+            each object after all other specified <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/> types.
             </summary>
         </member>
         <member name="P:Sandbox.Upgraders.AttemptAfterAttribute.InstanceUpgraderTypes">
             <summary>
-            <see cref="T:Sandbox.Hotload.InstanceUpgrader"/> types that should attempt to process each object before the type this attribute is on.
+            <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/> types that should attempt to process each object before the type this attribute is on.
             </summary>
         </member>
         <member name="M:Sandbox.Upgraders.AttemptAfterAttribute.#ctor(System.Type[])">
             <summary>
-            Create an instance of <see cref="T:Sandbox.Upgraders.AttemptAfterAttribute"/> with a list of <see cref="T:Sandbox.Hotload.InstanceUpgrader"/> types.
+            Create an instance of <see cref="T:Sandbox.Upgraders.AttemptAfterAttribute"/> with a list of <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/> types.
             </summary>
-            <param name="instanceUpgraderTypes">One or more <see cref="T:Sandbox.Hotload.InstanceUpgrader"/> types.</param>
+            <param name="instanceUpgraderTypes">One or more <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/> types.</param>
         </member>
         <member name="T:Sandbox.Upgraders.UpgraderGroup">
             <summary>
-            Used to organize <see cref="T:Sandbox.Hotload.InstanceUpgrader"/>s into groups that update
+            Used to organize <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/>s into groups that update
             in a particular order. Use <see cref="T:Sandbox.Upgraders.UpgraderGroupAttribute"/> to specify which group an
             upgrader should be added to.
             </summary>
         </member>
         <member name="F:Sandbox.Upgraders.UpgraderGroup.ChildUpgraders">
             <summary>
-            A list of <see cref="T:Sandbox.Hotload.InstanceUpgrader"/>s added to this group, where this group is their immediate parent.
+            A list of <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/>s added to this group, where this group is their immediate parent.
             </summary>
         </member>
         <member name="F:Sandbox.Upgraders.UpgraderGroup.ChildUpgraderOrder">
@@ -411,8 +441,8 @@
         </member>
         <member name="F:Sandbox.Upgraders.UpgraderGroup.UpgraderCache">
             <summary>
-            For each <see cref="T:System.Type"/>, caches which <see cref="T:Sandbox.Hotload.InstanceUpgrader"/>s should attempt to process
-            instances of that type, as given by <see cref="M:Sandbox.Hotload.InstanceUpgrader.ShouldProcessType(System.Type)"/>.
+            For each <see cref="T:System.Type"/>, caches which <see cref="T:Sandbox.Hotload.IInstanceUpgrader"/>s should attempt to process
+            instances of that type, as given by <see cref="M:Sandbox.Hotload.IInstanceUpgrader.ShouldProcessType(System.Type)"/>.
             </summary>
         </member>
         <member name="F:Sandbox.Upgraders.UpgraderGroup.UpgraderOrderDirty">
@@ -420,7 +450,7 @@
             Should <see cref="F:Sandbox.Upgraders.UpgraderGroup.ChildUpgraders"/> be sorted?
             </summary>
         </member>
-        <member name="M:Sandbox.Upgraders.UpgraderGroup.AddUpgrader(Sandbox.Hotload.InstanceUpgrader,System.Type[],System.Int32)">
+        <member name="M:Sandbox.Upgraders.UpgraderGroup.AddUpgrader(Sandbox.Hotload.IInstanceUpgrader,System.Type[],System.Int32)">
             <summary>
             Works out which child group to add the given upgrader to, or whether to add it to this group.
             </summary>

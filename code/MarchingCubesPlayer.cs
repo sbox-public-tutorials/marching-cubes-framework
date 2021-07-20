@@ -66,9 +66,9 @@ namespace MarchingCubes
 						if ( !generatedMap.ContainsKey( (xUsing, yUsing) ) )
 						{
 							//If not, build the meshes, and add an entry signaling that the coordinate is built.
-							ModelEntity e = generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 1 , (xUsing * 31) + 31, (yUsing * 31) + 31, 62 );
+							//ModelEntity e = generateMarchingCubes( new Vector3( xUsing * 1984, yUsing * 1984, 4096 ), (xUsing * 31) + 1, (yUsing * 31) + 1, 1 , (xUsing * 31) + 31, (yUsing * 31) + 31, 62 );
 							
-							generatedMap[(xUsing, yUsing)] = e;
+							//generatedMap[(xUsing, yUsing)] = e;
 						}
 
 					}
