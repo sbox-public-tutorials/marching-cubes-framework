@@ -11,7 +11,7 @@ namespace MarchingCubes
 	[Library( "minimal" )]
 	public partial class MarchingCubesGame : Sandbox.Game
 	{
-		[Net] List<bool> Map { get; set; }
+		[Net, OnChangedCallback] List<bool> Map { get; set; }
 		float timer;
 		public MarchingCubesGame()
 		{
@@ -77,9 +77,9 @@ namespace MarchingCubes
 				if ( Time.Now - timer > 0.5f )
 				{
 					//Flip a random bit every 5 seconds
-					int x = Rand.Int( 0, 127 );
-					int y = Rand.Int( 0, 127 );
-					int z = Rand.Int( 0, 127 );
+					int x = Rand.Int( 0, 31 );
+					int y = Rand.Int( 0, 31 );
+					int z = Rand.Int( 0, 31 );
 					int index = get3Dto1DarrayIndex( x, y, z, 128, 128, 128 );
 					Map[index] = !Map[index];
 					Log.Info( "change" );
