@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Numerics;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace MarchingCubes
 {
@@ -45,22 +46,6 @@ namespace MarchingCubes
 			if ( Input.Pressed( InputButton.Attack1 ) )
 			{
 				/*
-				bool[] binData = new bool[1024];
-				string s = "";
-				Random r = new Random(0);
-				for(int i = 0; i < binData.Length; i++ )
-				{
-					binData[i] = r.Next(0,2) == 0;
-					s += binData[i] ? "1" : "0";
-				}
-				Log.Info( s );
-				BinTree<bool> tree = binTreeize<bool>( binData );
-
-				String undone = stringifyBinTree( tree );
-				Log.Info( s );
-				Log.Info( undone );
-				Log.Info( s.Equals( undone ) );
-				*/
 				SimpleSlerpNoise ssn = new SimpleSlerpNoise( 0, new int[] { 1, 8, 16, 32, 64 }, new float[] { 0.01f, 0.09f, 0.2f, 0.2f, 0.5f } );
 
 				bool[,,][,,] superMap = new bool[16, 16, 4][,,];
@@ -106,6 +91,74 @@ namespace MarchingCubes
 					}
 				}
 				Log.Info( sw.ElapsedMilliseconds );
+				*/
+
+				//Action a = () => Log.Info( "Asd" );
+
+				//Action[] b = new Action[] { a };
+
+				//Parallel.Invoke( b );
+				Stopwatch sw = new Stopwatch();
+
+				if(IsClient)
+				{
+					//Run on left click in game
+					int i = 10;
+					/*
+					sw.Start();
+					Log.Info( fib( i ) );
+					sw.Stop();
+					Log.Info( "1 Took " + sw.ElapsedMilliseconds + "ms." );
+					
+
+					sw.Reset();
+					*/
+					sw.Start();
+
+					//Task<int> x = fibAsync( i );
+					//x.ContinueWith( ( t ) => Log.Info( t.Result ) );
+
+					fibAsync( i ).ContinueWith( (t) => Log.Info(t.Result) );
+
+					//Log.Info( x.Result );
+					sw.Stop();
+					Log.Info( "2 Took " + sw.ElapsedMilliseconds + "ms." );
+				}
+			}
+		}
+
+		public int fib(int x)
+		{
+			if(x == 0)
+			{
+				return 0;
+			}
+			if(x == 1)
+			{
+				return 1;
+			}
+			else
+			{
+				return fib( x - 1 ) + fib( x - 2 );
+			}
+		}
+
+		public async Task<int> fibAsync(int x)
+		{
+			if ( x == 0 )
+			{
+				return 0;
+			}
+			if ( x == 1 )
+			{
+				return 1;
+			}
+			else
+			{
+				int a = await fibAsync( x - 1 );
+				int b = await fibAsync( x - 2 );
+				await GameTask.NextPhysicsFrame();
+				return a+b;
 			}
 		}
 
