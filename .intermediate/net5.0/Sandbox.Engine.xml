@@ -249,11 +249,6 @@
             Find package information
             </summary>
         </member>
-        <member name="M:Sandbox.Package.Query(Sandbox.Package.Type,System.String)">
-            <summary>
-            Find package information
-            </summary>
-        </member>
         <member name="M:Sandbox.Package.FindAsync(System.String)">
             <summary>
             Find the gamemode info. We might already have the information, in which case we'll return a cached version.
@@ -690,7 +685,7 @@
         </member>
         <member name="M:Sandbox.FgdWriter.AddTags(Hammer.MetaDataAttribute[],System.Text.StringBuilder)">
             <summary>
-            Create the tags section, the 
+            Create the tags section
             </summary>
         </member>
         <member name="T:Sandbox.IMenuAddon">

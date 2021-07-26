@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "5P0dmj4SPt/Ubem3lrCSvTGraMZLkyIRszO5vawH0UGnvq2yKZ7yikiaG8vRRmf21ECdAi4kRtMtbm3D2CU13g==",
+  "dgSpecHash": "0pK0XePwX2BO4jTwFP4gDaoNQMFs6xowQjZLIATiuhW2cNRhIYHkR01JRyHeJXphUerTdPs1tL50kd7tGtDn1Q==",
   "success": true,
   "projectFilePath": "E:\\Games\\Steam\\steamapps\\common\\sbox\\Addons\\marching-cubes-framework\\code\\marching-cubes-framework.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\Main\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\5.0.0\\microsoft.aspnetcore.app.ref.5.0.0.nupkg.sha512",
+    "C:\\Users\\Main\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\5.0.0\\microsoft.windowsdesktop.app.ref.5.0.0.nupkg.sha512",
+    "C:\\Users\\Main\\.nuget\\packages\\microsoft.netcore.app.ref\\5.0.0\\microsoft.netcore.app.ref.5.0.0.nupkg.sha512"
+  ],
   "logs": []
 }

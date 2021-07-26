@@ -89,6 +89,11 @@
             Utility - return the entity we should be spawning particles from etc
             </summary>
         </member>
+        <member name="T:Sandbox.BasePathEntity">
+            <summary>
+            A base entity that will appear in Hammer's Path Tool and parse data from Hammer into a ready-to-use format in C#.
+            </summary>
+        </member>
         <member name="F:Sandbox.BasePathEntity.PathNodes">
             <summary>
             A list of nodes this entity represents, as set up in Hammer.
@@ -261,6 +266,11 @@
             Determine if an entity should be allowed to touch this trigger
             </summary>
         </member>
+        <member name="T:Sandbox.EntDoor">
+            <summary>
+            A basic door entity that can move or rotate. It can be a model or a mesh entity.
+            </summary>
+        </member>
         <member name="P:Sandbox.EntDoor.SpawnSettings">
             <summary>
             Settings that are only applicable when the entity spawns
@@ -358,9 +368,94 @@
             Called when the door fully closes.
             </summary>
         </member>
+        <member name="T:Sandbox.EntPlatform">
+            <summary>
+            A simple platform that moves between two locations and can be controlled through map IO.
+            </summary>
+        </member>
+        <member name="P:Sandbox.EntPlatform.MoveDir">
+            <summary>
+            Specifies the direction to move in when the platform is used, or axis of rotation for rotating platforms.
+            </summary>
+        </member>
+        <member name="P:Sandbox.EntPlatform.MoveDirIsLocal">
+            <summary>
+            If checked, the movement direction angle is in local space and should be rotated by the entity's angles after spawning.
+            </summary>
+        </member>
+        <member name="P:Sandbox.EntPlatform.MoveDistance">
+            <summary>
+            How much to move in the move direction.
+            </summary>
+        </member>
+        <member name="P:Sandbox.EntPlatform.Speed">
+            <summary>
+            The speed to move with.
+            </summary>
+        </member>
+        <member name="P:Sandbox.EntPlatform.SpawnSettings">
+            <summary>
+            Settings that are only applicable when the entity spawns
+            </summary>
+        </member>
+        <member name="P:Sandbox.EntPlatform.StartMoveSound">
+            <summary>
+            Sound to play when starting to move
+            </summary>
+        </member>
+        <member name="P:Sandbox.EntPlatform.StopMoveSound">
+            <summary>
+            Sound to play when we stopped moving
+            </summary>
+        </member>
+        <member name="P:Sandbox.EntPlatform.OnReachedStart">
+            <summary>
+            Fired when the platform reaches its beginning location
+            </summary>
+        </member>
+        <member name="P:Sandbox.EntPlatform.OnReachedEnd">
+            <summary>
+            Fired when the platform reaches its end location (startPos + dir * distance)
+            </summary>
+        </member>
+        <member name="M:Sandbox.EntPlatform.StartMoving">
+            <summary>
+            Start moving in platform's current move direction
+            </summary>
+        </member>
+        <member name="M:Sandbox.EntPlatform.StartMovingForward">
+            <summary>
+            Set the move direction to forwards and start moving
+            </summary>
+        </member>
+        <member name="M:Sandbox.EntPlatform.StartMovingBackwards">
+            <summary>
+            Set the move direction to backwards and start moving
+            </summary>
+        </member>
+        <member name="M:Sandbox.EntPlatform.ReverseMoving">
+            <summary>
+            Reverse current move direction. Will NOT start moving if stopped
+            </summary>
+        </member>
+        <member name="M:Sandbox.EntPlatform.StopMoving">
+            <summary>
+            Stop moving, preserving move direction
+            </summary>
+        </member>
+        <member name="M:Sandbox.EntPlatform.ToggleMoving">
+            <summary>
+            Toggle moving, preserving move direction
+            </summary>
+        </member>
+        <member name="M:Sandbox.EntPlatform.SetSpeed(System.Single)">
+            <summary>
+            Sets the move speed
+            </summary>
+        </member>
         <member name="T:Sandbox.FuncBrush">
             <summary>
-            A generic brush/mesh that can toggle its visibilty and collisions
+            A generic brush/mesh that can toggle its visibilty and collisions.
             </summary>
         </member>
         <member name="P:Sandbox.FuncBrush.Enabled">
@@ -402,6 +497,11 @@
         <member name="M:Sandbox.FuncBrush.Toggle">
             <summary>
             Toggle this func_brush
+            </summary>
+        </member>
+        <member name="T:Sandbox.FuncButton">
+            <summary>
+            A generic button that is useful to control other map entities via map input/outputs.
             </summary>
         </member>
         <member name="P:Sandbox.FuncButton.MoveDir">
@@ -496,6 +596,11 @@
             Simulates the button being pressed
             </summary>
         </member>
+        <member name="T:Sandbox.FuncPhysbox">
+            <summary>
+            A generic non model physics object.
+            </summary>
+        </member>
         <member name="P:Sandbox.FuncPhysbox.PropData">
             <summary>
             Physical properties of this physbox
@@ -579,6 +684,11 @@
             Used by LocalRotateKeyframeTo to try to rotate to a given rotation
             </summary>
         </member>
+        <member name="T:Sandbox.ParticleSystemEntity">
+            <summary>
+            A entity that represents and allows control of a single particle system.
+            </summary>
+        </member>
         <member name="P:Sandbox.ParticleSystemEntity.ParticleSystemName">
             <summary>
             The name of the particle system.
@@ -632,6 +742,11 @@
         <member name="M:Sandbox.ParticleSystemEntity.SetControlPoint">
             <summary>
             Set a Control Point via format - CP: X Y Z
+            </summary>
+        </member>
+        <member name="T:Sandbox.SoundEventEntity">
+            <summary>
+            Plays a sound event from a point. The point can be this entity or a specified entity's position.
             </summary>
         </member>
         <member name="P:Sandbox.SoundEventEntity.SoundName">
@@ -689,9 +804,34 @@
             Sets the damage per second for this trigger_hurt
             </summary>
         </member>
+        <member name="T:Sandbox.TriggerMultiple">
+            <summary>
+            A volume that can be triggered multiple times, including at an interval while something is inside the trigger volume.
+            </summary>
+        </member>
         <member name="P:Sandbox.TriggerMultiple.Wait">
             <summary>
             Amount of time, in seconds, after the trigger_multiple has triggered before it can be triggered again. If set to -1, it will never trigger again (in which case you should just use a trigger_once). This affects OnTrigger output.
+            </summary>
+        </member>
+        <member name="P:Sandbox.TriggerMultiple.OnTrigger">
+            <summary>
+            Called every "Delay before reset" seconds as long as at least one entity that passes filters is touching this trigger
+            </summary>
+        </member>
+        <member name="T:Sandbox.TriggerOnce">
+            <summary>
+            A simple trigger volume that fires once and then removes itself.
+            </summary>
+        </member>
+        <member name="P:Sandbox.TriggerOnce.OnTrigger">
+            <summary>
+            Called once at least a single entity that passes filters is touching this trigger, just before this trigger getting deleted
+            </summary>
+        </member>
+        <member name="T:Sandbox.TriggerTeleport">
+            <summary>
+            A simple trigger volume that teleports entities that touch it.
             </summary>
         </member>
         <member name="P:Sandbox.TriggerTeleport.TargetEntity">
@@ -967,6 +1107,11 @@
             Fancy dynamic sky
             </summary>
         </member>
+        <member name="T:Sandbox.SpawnPoint">
+            <summary>
+            This entity defines the sppawn point of the player in first person shooter gamemodes.
+            </summary>
+        </member>
         <member name="T:Sandbox.PickupTrigger">
             <summary>
             A utilty class. Add as a child to your pickupable entities to expand
@@ -977,6 +1122,11 @@
         <member name="M:Sandbox.PickupTrigger.SetTriggerSize(System.Single)">
             <summary>
             Set the trigger radius. Default is 16.
+            </summary>
+        </member>
+        <member name="T:Sandbox.WaterSea">
+            <summary>
+            Simple water effect
             </summary>
         </member>
         <member name="T:Sandbox.WaterVolume">
@@ -1455,7 +1605,7 @@
             How columns should be justified
             </summary>
         </member>
-        <member name="M:Sandbox.UI.Tests.GridLayout.Update(Rect,System.Single,Sandbox.UI.Justify)">
+        <member name="M:Sandbox.UI.Tests.GridLayout.Update(Sandbox.UI.Box,System.Single,System.Single,Sandbox.UI.Justify)">
             <summary>
             Update specifics of this layout. Returns true if we're dirty.
             </summary>

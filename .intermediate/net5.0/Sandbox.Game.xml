@@ -1072,7 +1072,7 @@
             similar to ignorez to draw over world but still having depth info
             </summary>
         </member>
-        <member name="M:Sandbox.EntityIO.Output.BuildTargets">
+        <member name="M:Sandbox.EntityIO.Output.BuildTargets(Sandbox.Entity)">
             <summary>
             Get a list of entities that are appropriate targets for this
             </summary>
@@ -1189,11 +1189,6 @@
         <member name="M:Sandbox.ModelEntity.OnCarryDrop(Sandbox.Entity)">
             <summary>
             Allow the entity to do what it wants when it's removed from the inventory
-            </summary>
-        </member>
-        <member name="M:Sandbox.ModelEntity.SetColor(System.String)">
-            <summary>
-            Sets the color of this entity. Format is "255 255 255 255".
             </summary>
         </member>
         <member name="P:Sandbox.ModelEntity.GlowColor">
@@ -3913,6 +3908,11 @@
             Sandbox.GameLoop.PhysicsImpactSound( ... )
             </summary>
         </member>
+        <member name="M:Managed.SourceClient.Exports.Sandbo_GameLo_OnPhysicsJointBreak(System.Int32)">
+            <summary>
+            Sandbox.GameLoop.OnPhysicsJointBreak( ... )
+            </summary>
+        </member>
         <member name="M:Managed.SourceClient.Exports.Sandbo_GameLo_ServerFrame_Think">
             <summary>
             Sandbox.GameLoop.ServerFrame_Think( ... )
@@ -4411,6 +4411,11 @@
         <member name="M:Managed.SourceServer.Exports.Sandbo_GameLo_PhysicsImpactSound(System.Int32,Vector3,System.Single,System.Single,System.Int32,System.Int32)">
             <summary>
             Sandbox.GameLoop.PhysicsImpactSound( ... )
+            </summary>
+        </member>
+        <member name="M:Managed.SourceServer.Exports.Sandbo_GameLo_OnPhysicsJointBreak(System.Int32)">
+            <summary>
+            Sandbox.GameLoop.OnPhysicsJointBreak( ... )
             </summary>
         </member>
         <member name="M:Managed.SourceServer.Exports.Sandbo_GameLo_ServerFrame_Think">
